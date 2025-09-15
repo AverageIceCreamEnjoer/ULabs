@@ -1,17 +1,12 @@
-#include <iostream>
-
-using ld = long double;
-
-ld Distribution(ld nu, ld mu, ld lambda) {}
-
-ld Mixture(ld nu1, ld mu1, ld lambda1, ld nu2, ld mu2, ld lambda2, ld p) {}
-
-ld EmpiricDist(std::vector<ld> data) {}
+#include "header.h"
 
 int main() {
-  ld nu, mu, lambda;
-  std::cout << "СОобщение вначале, типо введите вот эти параметры" << std::endl;
-  std::cin >> nu >> mu >> lambda;
-
+  ld nu, mu = 0, lambda = 1;
+  ld nuarr[] = {0.1, 0.5, 1, 2, 3, 5, 10, 30};
+  for (ld nu : nuarr) {
+    Distribution dist(nu, mu, lambda);
+    std::cout << " D = " << dist.D(0) << " G2 = " << dist.G2(0)
+              << " f(0) = " << dist(0) << std::endl;
+  }
   return 0;
 }
