@@ -40,7 +40,7 @@ struct Mixture {
   ld p;
   Distribution dist1, dist2;
 };
-/*
+
 // Инициализация смеси из двух распределений
 void initMixture(Mixture& mixt, ld nu1, ld mu1, ld lambda1, ld nu2, ld mu2,
                  ld lambda2, ld p);
@@ -91,4 +91,3 @@ ld G2Emp(const EmpiricDist& emp);
 ld XiEmp(const EmpiricDist& emp);
 // Моделирование случайной величины
 array_t XiEmpArray(const EmpiricDist& emp, uint16_t size);
-*/

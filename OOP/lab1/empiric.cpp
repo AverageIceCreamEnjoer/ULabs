@@ -3,7 +3,7 @@
 using namespace std;
 
 namespace {
-ld min(const array_t& x) {
+ld _min(const array_t& x) {
   ld m = x.data[0];
   for (size_t i = 1; i < x.length; ++i) {
     if (x.data[i] < m) m = x.data[i];
@@ -11,12 +11,21 @@ ld min(const array_t& x) {
   return m;
 }
 
-ld max(const array_t& x) {
+ld _max(const array_t& x) {
   ld m = x.data[0];
   for (size_t i = 1; i < x.length; ++i) {
     if (x.data[i] > m) m = x.data[i];
   }
   return m;
+}
+
+// return random number in (0, 1)
+ld _randNum() {
+  ld r;
+  do {
+    r = static_cast<ld>(rand()) / RAND_MAX;
+  } while (r == 0 || r == 1);
+  return r;
 }
 }  // namespace
 
@@ -66,6 +75,37 @@ array_t densityEmpArray(const EmpiricDist& emp, const array_t& x) {
 
 ld MEmp(const EmpiricDist& emp) {
   ld sum = 0;
-  for (size_t i = 0; i < emp.xi.length; ++i) sum += i;
+  for (size_t i = 0; i < emp.xi.length; ++i) sum += emp.xi.data[i];
   return sum / emp.xi.length;
+}
+
+ld DEmp(const EmpiricDist& emp) {
+  ld m = MEmp(emp);
+  ld sum = 0;
+  for (size_t i = 0; i < emp.xi.length; ++i) sum += pow(emp.xi.data[i] - m, 2);
+  return sum / emp.xi.length;
+}
+
+ld G1Emp(const EmpiricDist& emp) {
+  ld m = MEmp(emp);
+  ld d = DEmp(emp);
+  ld sum = 0;
+  for (size_t i = 0; i < emp.xi.length; ++i) sum += pow(emp.xi.data[i] - m, 3);
+  return sum / emp.xi.length / pow(d, 1.5);
+}
+
+ld G2Emp(const EmpiricDist& emp) {
+  ld m = MEmp(emp);
+  ld d = DEmp(emp);
+  ld sum = 0;
+  for (size_t i = 0; i < emp.xi.length; ++i) sum += pow(emp.xi.data[i] - m, 4);
+  return sum / emp.xi.length / pow(d, 2) - 3;
+}
+
+ld XiEmp(const EmpiricDist& emp) {
+  ld r = _randNum();
+  uint16_t i = floor(r * emp.k);
+  if (i == emp.k) i = emp.k - 1;
+  ld r2 = _randNum();
+  return emp.X.data[i] + r2 * emp.delta;
 }
