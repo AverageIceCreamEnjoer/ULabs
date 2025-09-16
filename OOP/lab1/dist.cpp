@@ -39,16 +39,16 @@ array_t densityDistArray(const Distribution& dist, const array_t& x) {
   return result;
 }
 
-ld DDist(const Distribution& dist, ld x) {
+ld DDist(const Distribution& dist) {
   return pow(dist.lambda, 2) * boost::math::cyl_bessel_k(2, dist.nu) /
          boost::math::cyl_bessel_k(1, dist.nu);
 }
 
-ld MDist(const Distribution& dist, ld x) { return dist.mu; }
+ld MDist(const Distribution& dist) { return dist.mu; }
 
-ld G1Dist(const Distribution& dist, ld x) { return 0; }
+ld G1Dist(const Distribution& dist) { return 0; }
 
-ld G2Dist(const Distribution& dist, ld x) {
+ld G2Dist(const Distribution& dist) {
   return 3 * boost::math::cyl_bessel_k(3, dist.nu) *
              boost::math::cyl_bessel_k(1, dist.nu) /
              pow(boost::math::cyl_bessel_k(2, dist.nu), 2) -

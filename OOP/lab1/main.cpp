@@ -6,7 +6,7 @@ int main() {
   for (ld nu : nuarr) {
     Distribution dist;
     initDistribution(dist, nu, mu, lambda);
-    std::cout << " D = " << DDist(dist, 0) << " G2 = " << G2Dist(dist, 0)
+    std::cout << " D = " << DDist(dist) << " G2 = " << G2Dist(dist)
               << " f(0) = " << densityDist(dist, 0) << std::endl;
   }
   return 0;

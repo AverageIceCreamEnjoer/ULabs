@@ -34,38 +34,38 @@ array_t densityMixtArray(const Mixture& mixt, const array_t& x) {
   return result;
 }
 
-ld MMixt(const Mixture& mixt, ld x) {
-  return (1 - mixt.p) * MDist(mixt.dist1, x) + mixt.p * MDist(mixt.dist2, x);
+ld MMixt(const Mixture& mixt) {
+  return (1 - mixt.p) * MDist(mixt.dist1) + mixt.p * MDist(mixt.dist2);
 }
 
-ld DMixt(const Mixture& mixt, ld x) {
-  return (1 - mixt.p) * (pow(MDist(mixt.dist1, x), 2) + DDist(mixt.dist1, x)) +
-         mixt.p * (pow(MDist(mixt.dist2, x), 2) + DDist(mixt.dist2, x)) -
-         pow(MMixt(mixt, x), 2);
+ld DMixt(const Mixture& mixt) {
+  return (1 - mixt.p) * (pow(MDist(mixt.dist1), 2) + DDist(mixt.dist1)) +
+         mixt.p * (pow(MDist(mixt.dist2), 2) + DDist(mixt.dist2)) -
+         pow(MMixt(mixt), 2);
 }
 
-ld G1Mixt(const Mixture& mixt, ld x) {
-  ld m1 = MDist(mixt.dist1, x), m2 = MDist(mixt.dist2, x),
-     d1 = DDist(mixt.dist1, x), d2 = DDist(mixt.dist2, x);
-  ld m = MMixt(mixt, x);
+ld G1Mixt(const Mixture& mixt) {
+  ld m1 = MDist(mixt.dist1), m2 = MDist(mixt.dist2), d1 = DDist(mixt.dist1),
+     d2 = DDist(mixt.dist2);
+  ld m = MMixt(mixt);
   return ((1 - mixt.p) * (pow(m1 - m, 3) + 3 * (m1 - m) * d1 +
-                          pow(d1, 1.5) * G1Dist(mixt.dist1, x)) +
+                          pow(d1, 1.5) * G1Dist(mixt.dist1)) +
           mixt.p * (pow(m2 - m, 3) + 3 * (m2 - m) * d2 +
-                    pow(d2, 1.5) * G1Dist(mixt.dist2, x))) /
-         pow(DMixt(mixt, x), 1.5);
+                    pow(d2, 1.5) * G1Dist(mixt.dist2))) /
+         pow(DMixt(mixt), 1.5);
 }
 
-ld G2Mixt(const Mixture& mixt, ld x) {
-  ld m1 = MDist(mixt.dist1, x), m2 = MDist(mixt.dist2, x),
-     d1 = DDist(mixt.dist1, x), d2 = DDist(mixt.dist2, x);
-  ld m = MMixt(mixt, x);
+ld G2Mixt(const Mixture& mixt) {
+  ld m1 = MDist(mixt.dist1), m2 = MDist(mixt.dist2), d1 = DDist(mixt.dist1),
+     d2 = DDist(mixt.dist2);
+  ld m = MMixt(mixt);
   return ((1 - mixt.p) * (pow(m1 - m, 4) + 6 * pow(m1 - m, 2) * d1 +
-                          4 * (m1 - m) * pow(d1, 1.5) * G1Dist(mixt.dist1, x) +
-                          pow(d1, 2) * (G2Dist(mixt.dist1, x) + 3)) +
+                          4 * (m1 - m) * pow(d1, 1.5) * G1Dist(mixt.dist1) +
+                          pow(d1, 2) * (G2Dist(mixt.dist1) + 3)) +
           mixt.p * (pow(m2 - m, 4) + 6 * pow(m2 - m, 2) * d2 +
-                    4 * (m2 - m) * pow(d2, 1.5) * G1Dist(mixt.dist2, x) +
-                    pow(d2, 2) * (G2Dist(mixt.dist2, x) + 3))) /
-             pow(DMixt(mixt, x), 2) -
+                    4 * (m2 - m) * pow(d2, 1.5) * G1Dist(mixt.dist2) +
+                    pow(d2, 2) * (G2Dist(mixt.dist2) + 3))) /
+             pow(DMixt(mixt), 2) -
          3;
 }
 
