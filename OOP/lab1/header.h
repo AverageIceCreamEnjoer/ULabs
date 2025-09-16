@@ -34,34 +34,34 @@ ld G1Dist(const Distribution& dist, ld x);
 ld XiDist(const Distribution& dist);
 // Моделирование случайной величины
 array_t XiDistArray(const Distribution& dist, uint16_t size);
-/*
+
 // Смесь двух симметрических гиперболических распределений - функция плотности
 struct Mixture {
-  // Constructor
-  Mixture(ld nu1, ld mu1, ld lambda1, ld nu2, ld mu2, ld lambda2, ld p);
-  // значение функции плотности распределения от 1 аргумента
-  ld operator()(ld x) const;
-  // значение функции плотности распределения от массива аргументов
-  array_t operator()(const array_t& x) const;
-
-  // Математическое ожидание
-  ld M(ld x) const;
-  // Дисперсия
-  ld D(ld x) const;
-  // Коэффициент эксцесса
-  ld G2(ld x) const;
-  // Коэффициент ассиметрии
-  ld G1(ld x) const;
-
-  // Моделирование случайной величины
-  ld xi() const;
-  // Моделирование случайной величины
-  array_t xi(uint16_t size) const;
-
- private:
-  ld m_p;
-  Distribution m_dist1, m_dist2;
+  ld p;
+  Distribution dist1, dist2;
 };
+
+// Constructor
+void initMixture(Mixture& mixt, ld nu1, ld mu1, ld lambda1, ld nu2, ld mu2,
+                 ld lambda2, ld p);
+// значение функции плотности распределения от 1 аргумента
+ld densityMixt(const Mixture& mixt, ld x);
+// значение функции плотности распределения от массива аргументов
+array_t densityMixtArray(const Mixture& mixt, const array_t& x);
+
+// Математическое ожидание
+ld MMixt(const Mixture& mixt, ld x);
+// Дисперсия
+ld DMixt(const Mixture& mixt, ld x);
+// Коэффициент эксцесса
+ld G2Mixt(const Mixture& mixt, ld x);
+// Коэффициент ассиметрии
+ld G1mixt(const Mixture& mixt, ld x);
+
+// Моделирование случайной величины
+ld XiMixt(const Mixture& mixt);
+// Моделирование случайной величины
+array_t XiMixtArray(const Mixture& mixt, uint16_t size);
 
 // Эмпирическое распределение - функция плотности
 struct EmpiricDist {
