@@ -13,62 +13,65 @@ ld _randNum() {
 }
 }  // namespace
 
-Distribution::Distribution(ld nu, ld mu, ld lambda)
-    : m_nu(nu), m_mu(mu), m_lambda(lambda) {
-  if (lambda <= 0 || nu <= 0) {
+void initDistribution(Distribution& dist, ld nu, ld mu, ld lambda) {
+  if (lambda <= 0 || nu <= 0)
     throw invalid_argument("Lambda and nu must be positive");
-  }
+  dist.nu = nu;
+  dist.mu = mu;
+  dist.lambda = lambda;
 }
 
-ld Distribution::operator()(ld x) const {
-  ld coeff = 2 * m_lambda * sqrt(m_nu) * boost::math::cyl_bessel_k(1, m_nu);
-  ld exponent = exp(-m_nu * sqrt(1 + pow((x - m_mu) / m_lambda, 2) / m_nu));
+ld densityDist(const Distribution& dist, ld x) {
+  ld coeff =
+      2 * dist.lambda * sqrt(dist.nu) * boost::math::cyl_bessel_k(1, dist.nu);
+  ld exponent =
+      exp(-dist.nu * sqrt(1 + pow((x - dist.mu) / dist.lambda, 2) / dist.nu));
   return exponent / coeff;
 }
 
-array_t Distribution::operator()(const array_t& x) const {
+array_t densityDistArray(const Distribution& dist, const array_t& x) {
   array_t result;
   result.length = x.length;
   result.data = new ld[x.length];
   for (uint16_t i = 0; i < x.length; ++i) {
-    result.data[i] = (*this)(x.data[i]);
+    result.data[i] = densityDist(dist, x.data[i]);
   }
   return result;
 }
 
-ld Distribution::D(ld x) const {
-  return pow(m_lambda, 2) * boost::math::cyl_bessel_k(2, m_nu) /
-         boost::math::cyl_bessel_k(1, m_nu);
+ld DDist(const Distribution& dist, ld x) {
+  return pow(dist.lambda, 2) * boost::math::cyl_bessel_k(2, dist.nu) /
+         boost::math::cyl_bessel_k(1, dist.nu);
 }
 
-ld Distribution::M(ld x) const { return m_mu; }
+ld MDist(const Distribution& dist, ld x) { return dist.mu; }
 
-ld Distribution::G1(ld x) const { return 0; }
+ld G1Dist(const Distribution& dist, ld x) { return 0; }
 
-ld Distribution::G2(ld x) const {
-  return 3 * boost::math::cyl_bessel_k(3, m_nu) *
-             boost::math::cyl_bessel_k(1, m_nu) /
-             pow(boost::math::cyl_bessel_k(2, m_nu), 2) -
+ld G2Dist(const Distribution& dist, ld x) {
+  return 3 * boost::math::cyl_bessel_k(3, dist.nu) *
+             boost::math::cyl_bessel_k(1, dist.nu) /
+             pow(boost::math::cyl_bessel_k(2, dist.nu), 2) -
          3;
 }
 
-ld Distribution::xi() const {
+ld XiDist(const Distribution& dist) {
   ld r1, r2, delta, t;
   do {
     r1 = _randNum();
     r2 = _randNum();
-    delta = 2 * (sqrt(1 + pow(m_nu, 2)) - 1) / m_nu;
+    delta = 2 * (sqrt(1 + pow(dist.nu, 2)) - 1) / dist.nu;
     t = -2 * log(r1) / delta;
-  } while (-log(r2) <= (m_nu - delta) * t / 2 + m_nu / (2 * t) -
-                           sqrt(m_nu * (m_nu - delta)));
+  } while (-log(r2) <= (dist.nu - delta) * t / 2 + dist.nu / (2 * t) -
+                           sqrt(dist.nu * (dist.nu - delta)));
   ld r3 = _randNum(), r4 = _randNum();
   ld z = sqrt(-2 * log(r3)) * cos(2 * pi * r4);
   // z = sqrt(-2 * log(r3)) * sin(2 * pi * r4);
   return z * sqrt(t);
 }
 
-array_t Distribution::xi(uint16_t size) const {
+array_t XiDist(const Distribution& dist, uint16_t size) {
   array_t result{size, new ld[size]};
-  for (uint16_t i = 0; i < size; ++i) result.data[i] = xi();
+  for (uint16_t i = 0; i < size; ++i) result.data[i] = XiDist(dist);
   return result;
 }

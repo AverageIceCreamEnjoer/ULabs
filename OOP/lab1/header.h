@@ -13,31 +13,28 @@ struct array_t {
 
 // Симметрическое гиперболическое распределение - функция плотности
 struct Distribution {
-  // Constructor
-  Distribution(ld nu, ld mu, ld lambda);
-  // значение функции плотности распределения от 1 аргумента
-  ld operator()(ld x) const;
-  // значение функции плотности распределения от массива аргументов
-  array_t operator()(const array_t& x) const;
-
-  // Математическое ожидание
-  ld M(ld x) const;
-  // Дисперсия
-  ld D(ld x) const;
-  // Коэффициент эксцесса
-  ld G2(ld x) const;
-  // Коэффициент ассиметрии
-  ld G1(ld x) const;
-
-  // Моделирование случайной величины
-  ld xi() const;
-  // Моделирование случайной величины
-  array_t xi(uint16_t size) const;
-
- private:
-  ld m_nu, m_mu, m_lambda;
+  ld nu, mu, lambda;
 };
+// инициализация
+void initDistribution(Distribution& dist, ld nu, ld mu, ld lambda);
+// значение функции плотности распределения от 1 аргумента
+ld densityDist(const Distribution& dist, ld x);
+// значение функции плотности распределения от массива аргументов
+array_t densityDistArray(const Distribution& dist, const array_t& x);
+// Математическое ожидание
+ld MDist(const Distribution& dist, ld x);
+// Дисперсия
+ld DDist(const Distribution& dist, ld x);
+// Коэффициент эксцесса
+ld G2Dist(const Distribution& dist, ld x);
+// Коэффициент ассиметрии
+ld G1Dist(const Distribution& dist, ld x);
 
+// Моделирование случайной величины
+ld XiDist(const Distribution& dist);
+// Моделирование случайной величины
+array_t XiDistArray(const Distribution& dist, uint16_t size);
+/*
 // Смесь двух симметрических гиперболических распределений - функция плотности
 struct Mixture {
   // Constructor
@@ -65,8 +62,20 @@ struct Mixture {
   ld m_p;
   Distribution m_dist1, m_dist2;
 };
-/*
-// Эмпирическое распределение - функция плотности (для начала, нужно еше
-// построить распределение по выборке (не используя классы))
-array_t EmpiricDist(ld nu, ld mu, ld lambda);
+
+// Эмпирическое распределение - функция плотности
+struct EmpiricDist {
+  EmpiricDist(const array_t& x);
+  // значение функции плотности распределения от 1 аргумента
+  ld operator()(ld x) const;
+  // значение функции плотности распределения от массива аргументов
+  array_t operator()(const array_t& x) const;
+
+ private:
+  array_t m_X;
+  array_t m_x;
+  uint16_t m_k;
+  ld m_delta;
+  uint16_t* m_n;
+};
 */
