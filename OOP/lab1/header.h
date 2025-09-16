@@ -1,5 +1,6 @@
 #include <boost/math/special_functions/bessel.hpp>
 #include <cmath>
+#include <fstream>
 #include <iostream>
 
 using ld = long double;
@@ -7,7 +8,7 @@ using ld = long double;
 const ld pi = 3.14159265358979;
 
 struct array_t {
-  uint16_t length;
+  uint32_t length;
   ld* data;
 };
 
@@ -28,12 +29,12 @@ ld DDist(const Distribution& dist);
 // Коэффициент эксцесса
 ld G2Dist(const Distribution& dist);
 // Коэффициент ассиметрии
-ld G1Dist(const Distribution& dist);
+ld G1Dist();
 
 // Моделирование случайной величины
 ld XiDist(const Distribution& dist);
 // Моделирование случайной величины
-array_t XiDistArray(const Distribution& dist, uint16_t size);
+array_t XiDistArray(const Distribution& dist, uint32_t size);
 
 // Смесь двух симметрических гиперболических распределений - функция плотности
 struct Mixture {
@@ -61,15 +62,15 @@ ld G1Mixt(const Mixture& mixt);
 // Моделирование случайной величины
 ld XiMixt(const Mixture& mixt);
 // Моделирование случайной величины
-array_t XiMixtArray(const Mixture& mixt, uint16_t size);
+array_t XiMixtArray(const Mixture& mixt, uint32_t size);
 
 // Эмпирическое распределение - функция плотности
 struct EmpiricDist {
   array_t X;    // интервалы
   array_t xi;   // начальная выборка
-  uint16_t k;   // количество интервалов
+  uint32_t k;   // количество интервалов
   ld delta;     // ширина интервала
-  uint16_t* n;  // количество элементов в интервале
+  uint32_t* n;  // количество элементов в интервале
 };
 
 void initEmpiric(EmpiricDist& emp, const array_t& x);
@@ -90,4 +91,4 @@ ld G2Emp(const EmpiricDist& emp);
 // Моделирование случайной величины
 ld XiEmp(const EmpiricDist& emp);
 // Моделирование случайной величины
-array_t XiEmpArray(const EmpiricDist& emp, uint16_t size);
+array_t XiEmpArray(const EmpiricDist& emp, uint32_t size);

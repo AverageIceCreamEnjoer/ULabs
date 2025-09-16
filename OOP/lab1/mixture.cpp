@@ -28,7 +28,7 @@ ld densityMixt(const Mixture& mixt, ld x) {
 
 array_t densityMixtArray(const Mixture& mixt, const array_t& x) {
   array_t result{x.length, new ld[x.length]};
-  for (uint16_t i = 0; i < x.length; ++i) {
+  for (uint32_t i = 0; i < x.length; ++i) {
     result.data[i] = densityMixt(mixt, x.data[i]);
   }
   return result;
@@ -48,10 +48,10 @@ ld G1Mixt(const Mixture& mixt) {
   ld m1 = MDist(mixt.dist1), m2 = MDist(mixt.dist2), d1 = DDist(mixt.dist1),
      d2 = DDist(mixt.dist2);
   ld m = MMixt(mixt);
-  return ((1 - mixt.p) * (pow(m1 - m, 3) + 3 * (m1 - m) * d1 +
-                          pow(d1, 1.5) * G1Dist(mixt.dist1)) +
-          mixt.p * (pow(m2 - m, 3) + 3 * (m2 - m) * d2 +
-                    pow(d2, 1.5) * G1Dist(mixt.dist2))) /
+  return ((1 - mixt.p) *
+              (pow(m1 - m, 3) + 3 * (m1 - m) * d1 + pow(d1, 1.5) * G1Dist()) +
+          mixt.p *
+              (pow(m2 - m, 3) + 3 * (m2 - m) * d2 + pow(d2, 1.5) * G1Dist())) /
          pow(DMixt(mixt), 1.5);
 }
 
@@ -60,10 +60,10 @@ ld G2Mixt(const Mixture& mixt) {
      d2 = DDist(mixt.dist2);
   ld m = MMixt(mixt);
   return ((1 - mixt.p) * (pow(m1 - m, 4) + 6 * pow(m1 - m, 2) * d1 +
-                          4 * (m1 - m) * pow(d1, 1.5) * G1Dist(mixt.dist1) +
+                          4 * (m1 - m) * pow(d1, 1.5) * G1Dist() +
                           pow(d1, 2) * (G2Dist(mixt.dist1) + 3)) +
           mixt.p * (pow(m2 - m, 4) + 6 * pow(m2 - m, 2) * d2 +
-                    4 * (m2 - m) * pow(d2, 1.5) * G1Dist(mixt.dist2) +
+                    4 * (m2 - m) * pow(d2, 1.5) * G1Dist() +
                     pow(d2, 2) * (G2Dist(mixt.dist2) + 3))) /
              pow(DMixt(mixt), 2) -
          3;
@@ -73,8 +73,8 @@ ld XiMixt(const Mixture& mixt) {
   return (_randNum() < (1 - mixt.p)) ? XiDist(mixt.dist1) : XiDist(mixt.dist2);
 }
 
-array_t XiMixtArray(const Mixture& mixt, uint16_t size) {
+array_t XiMixtArray(const Mixture& mixt, uint32_t size) {
   array_t result{size, new ld[size]};
-  for (uint16_t i = 0; i < size; ++i) result.data[i] = XiMixt(mixt);
+  for (uint32_t i = 0; i < size; ++i) result.data[i] = XiMixt(mixt);
   return result;
 }

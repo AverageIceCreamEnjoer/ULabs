@@ -8,7 +8,7 @@ ld _randNum() {
   ld r;
   do {
     r = static_cast<ld>(rand()) / RAND_MAX;
-  } while (r == 0 || r == 1);
+  } while (r == 0. || r == 1.);
   return r;
 }
 }  // namespace
@@ -33,7 +33,7 @@ array_t densityDistArray(const Distribution& dist, const array_t& x) {
   array_t result;
   result.length = x.length;
   result.data = new ld[x.length];
-  for (uint16_t i = 0; i < x.length; ++i) {
+  for (uint32_t i = 0; i < x.length; ++i) {
     result.data[i] = densityDist(dist, x.data[i]);
   }
   return result;
@@ -46,7 +46,7 @@ ld DDist(const Distribution& dist) {
 
 ld MDist(const Distribution& dist) { return dist.mu; }
 
-ld G1Dist(const Distribution& dist) { return 0; }
+ld G1Dist() { return 0; }
 
 ld G2Dist(const Distribution& dist) {
   return 3 * boost::math::cyl_bessel_k(3, dist.nu) *
@@ -70,8 +70,8 @@ ld XiDist(const Distribution& dist) {
   return z * sqrt(t);
 }
 
-array_t XiDist(const Distribution& dist, uint16_t size) {
+array_t XiDistArray(const Distribution& dist, uint32_t size) {
   array_t result{size, new ld[size]};
-  for (uint16_t i = 0; i < size; ++i) result.data[i] = XiDist(dist);
+  for (uint32_t i = 0; i < size; ++i) result.data[i] = XiDist(dist);
   return result;
 }
