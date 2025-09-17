@@ -67,7 +67,7 @@ ld XiDist(const Distribution& dist) {
   ld r3 = _randNum(), r4 = _randNum();
   ld z = sqrt(-2 * log(r3)) * cos(2 * pi * r4);
   // z = sqrt(-2 * log(r3)) * sin(2 * pi * r4);
-  return z * sqrt(t);
+  return z * sqrt(t) * dist.lambda + dist.mu;
 }
 
 array_t XiDistArray(const Distribution& dist, uint32_t size) {
