@@ -129,7 +129,9 @@ void testDistribution_3_3_1_1() {
   Distribution dist;
   initDistribution(dist, nu, mu, lambda);
   EmpiricDist emp;
-  initEmpiric(emp, XiDistArray(dist, n));
+  auto arr = XiDistArray(dist, n);
+  initEmpiric(emp, arr);
+  delete[] arr.data;
   cout << "\n-----Тест 3.3.1.1-----" << endl;
   cout << "Тест эмпирического распределения:" << endl;
   cout << "Распределение построено на основе выборки " << n
@@ -142,6 +144,9 @@ void testDistribution_3_3_1_1() {
   cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
   cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
        << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
+  delete[] emp.X.data;
+  delete[] emp.n;
+  delete[] emp.xi.data;
 }
 
 void testDistribution_3_3_1_2() {
@@ -151,7 +156,9 @@ void testDistribution_3_3_1_2() {
   Distribution dist;
   initDistribution(dist, nu, mu, lambda);
   EmpiricDist emp;
-  initEmpiric(emp, XiDistArray(dist, n));
+  auto arr = XiDistArray(dist, n);
+  initEmpiric(emp, arr);
+  delete[] arr.data;
   cout << "\n-----Тест 3.3.1.2-----" << endl;
   cout << "Тест эмпирического распределения:" << endl;
   cout << "Распределение построено на основе выборки " << n
@@ -164,6 +171,9 @@ void testDistribution_3_3_1_2() {
   cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
   cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
        << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
+  delete[] emp.X.data;
+  delete[] emp.n;
+  delete[] emp.xi.data;
 }
 
 void testDistribution_3_3_1_3() {
@@ -173,7 +183,9 @@ void testDistribution_3_3_1_3() {
   Mixture mixture;
   initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
   EmpiricDist emp;
-  initEmpiric(emp, XiMixtArray(mixture, n));
+  auto arr = XiMixtArray(mixture, n);
+  initEmpiric(emp, arr);
+  delete[] arr.data;
   cout << "\n-----Тест 3.3.1.3-----" << endl;
   cout << "Тест эмпирического распределения:" << endl;
   cout << "Распределение построено на основе выборки " << n
@@ -190,6 +202,9 @@ void testDistribution_3_3_1_3() {
   cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
   cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
        << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
+  delete[] emp.X.data;
+  delete[] emp.n;
+  delete[] emp.xi.data;
 }
 void testDistribution_3_3_1_4() {
   ld mu1 = 0, mu2 = 3, lambda1 = 1, lambda2 = 2, nu1 = 1, nu2 = 3;
@@ -198,7 +213,9 @@ void testDistribution_3_3_1_4() {
   Mixture mixture;
   initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
   EmpiricDist emp;
-  initEmpiric(emp, XiMixtArray(mixture, n));
+  auto arr = XiMixtArray(mixture, n);
+  initEmpiric(emp, arr);
+  delete[] arr.data;
   cout << "\n-----Тест 3.3.1.4-----" << endl;
   cout << "Тест эмпирического распределения:" << endl;
   cout << "Распределение построено на основе выборки " << n
@@ -215,6 +232,9 @@ void testDistribution_3_3_1_4() {
   cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
   cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
        << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
+  delete[] emp.X.data;
+  delete[] emp.n;
+  delete[] emp.xi.data;
 }
 
 void testDistribution_3_3_2() {
@@ -224,7 +244,9 @@ void testDistribution_3_3_2() {
   Distribution dist;
   initDistribution(dist, nu, mu, lambda);
   EmpiricDist emp;
-  initEmpiric(emp, XiDistArray(dist, n));
+  auto arr = XiDistArray(dist, n);
+  initEmpiric(emp, arr);
+  delete[] arr.data;
   cout << "\n-----Тест 3.3.2-----" << endl;
   cout << "Тест эмпирического распределения:" << endl;
   cout << "Распределение построено на основе выборки " << n
@@ -238,10 +260,18 @@ void testDistribution_3_3_2() {
   cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
        << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
   EmpiricDist emp2;
-  initEmpiric(emp2, XiEmpArray(emp, n));
+  auto arr2 = XiEmpArray(emp, n);
+  initEmpiric(emp2, arr2);
+  delete[] arr2.data;
   cout << "Эмпирическое распределение2:\nf(0) = " << densityEmp(emp2, x);
   cout << ", M = " << MEmp(emp2) << ", D = " << DEmp(emp2)
        << ", G1 = " << G1Emp(emp2) << ", G2 = " << G2Emp(emp2) << endl;
+  delete[] emp.X.data;
+  delete[] emp.n;
+  delete[] emp.xi.data;
+  delete[] emp2.X.data;
+  delete[] emp2.n;
+  delete[] emp2.xi.data;
 }
 
 void testVariantTable() {

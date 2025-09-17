@@ -30,10 +30,13 @@ ld _randNum() {
 }  // namespace
 
 void initEmpiric(EmpiricDist& emp, const array_t& x) {
-  emp.xi = x;
+  emp.xi.length = x.length;
+  emp.xi.data = new ld[x.length];
+  for (uint32_t i = 0; i < x.length; ++i) emp.xi.data[i] = x.data[i];
   if (x.length == 0) throw invalid_argument("Array length is 0");
   emp.k = floor(log2(x.length)) + 1;
   emp.n = new uint32_t[emp.k];
+  for (uint32_t i = 0; i < emp.k; ++i) emp.n[i] = 0;
   emp.X.length = emp.k + 1;
   emp.X.data = new ld[emp.X.length];
   ld mn = _min(x), mx = _max(x);
