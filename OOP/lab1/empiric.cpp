@@ -126,3 +126,11 @@ ld XiEmp(const EmpiricDist& emp) {
   }
   return emp.X.data[emp.k - 1];
 }
+
+array_t XiEmpArray(const EmpiricDist& emp, uint32_t size) {
+  array_t res{size, new ld[size]};
+  for (uint32_t i = 0; i < size; ++i) {
+    res.data[i] = XiEmp(emp);
+  }
+  return res;
+}

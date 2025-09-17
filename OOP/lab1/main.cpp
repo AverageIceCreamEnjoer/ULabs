@@ -217,6 +217,33 @@ void testDistribution_3_3_1_4() {
        << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
 }
 
+void testDistribution_3_3_2() {
+  ld mu = 0, lambda = 1, nu = 1;
+  ld x = 0;
+  uint32_t n = 10000;
+  Distribution dist;
+  initDistribution(dist, nu, mu, lambda);
+  EmpiricDist emp;
+  initEmpiric(emp, XiDistArray(dist, n));
+  cout << "\n-----Тест 3.3.2-----" << endl;
+  cout << "Тест эмпирического распределения:" << endl;
+  cout << "Распределение построено на основе выборки " << n
+       << " элементов из основного распределения со следующими параметрами:"
+       << endl;
+  cout << "nu = " << nu << ", mu = " << mu << ", lambda = " << lambda << endl;
+  cout << "Выборка:\nf(0) = " << densityDist(dist, x);
+  cout << ", M = " << MDist(dist) << ", D = " << DDist(dist)
+       << ", G1 = " << G1Dist() << ", G2 = " << G2Dist(dist) << endl;
+  cout << "Эмпирическое распределение1:\nf(0) = " << densityEmp(emp, x);
+  cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
+       << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
+  EmpiricDist emp2;
+  initEmpiric(emp2, XiEmpArray(emp, n));
+  cout << "Эмпирическое распределение2:\nf(0) = " << densityEmp(emp2, x);
+  cout << ", M = " << MEmp(emp2) << ", D = " << DEmp(emp2)
+       << ", G1 = " << G1Emp(emp2) << ", G2 = " << G2Emp(emp2) << endl;
+}
+
 void testVariantTable() {
   ld mu = 0, lambda = 1;
   ld nuarr[] = {0.1, 0.5, 1, 2, 3, 5, 10, 30};
@@ -242,5 +269,6 @@ int main() {
   testDistribution_3_3_1_2();
   testDistribution_3_3_1_3();
   testDistribution_3_3_1_4();
+  testDistribution_3_3_2();
   return 0;
 }
