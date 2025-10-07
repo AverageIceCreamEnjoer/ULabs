@@ -1,0 +1,6 @@
+.pytest_cache
+.virtual_documents
+.vscode
+*.pdf
+*.csv
+.ipynb_checkpoints
