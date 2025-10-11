@@ -72,8 +72,8 @@ ld MainDist::density(ld x) const noexcept {
   return exponent / coeff;
 }
 
-vector MainDist::density(const vector& x) const {
-  vector result(x.size());
+nstu::vector MainDist::density(const nstu::vector& x) const {
+  nstu::vector result(x.size());
   for (uint32_t i = 0; i < x.size(); ++i) {
     result[i] = density(x[i]);
   }
@@ -99,20 +99,20 @@ ld MainDist::G2() const noexcept {
 ld MainDist::Xi() const noexcept {
   ld r1, r2, delta, t;
   do {
-    r1 = _randNum();
-    r2 = _randNum();
+    r1 = nstu::randNum();
+    r2 = nstu::randNum();
     delta = 2 * (sqrt(1 + pow(m_nu, 2)) - 1) / m_nu;
     t = -2 * log(r1) / delta;
   } while (-log(r2) <= (m_nu - delta) * t / 2 + m_nu / (2 * t) -
                            sqrt(m_nu * (m_nu - delta)));
-  ld r3 = _randNum(), r4 = _randNum();
+  ld r3 = nstu::randNum(), r4 = nstu::randNum();
   ld z = sqrt(-2 * log(r3)) * cos(2 * pi * r4);
   // z = sqrt(-2 * log(r3)) * sin(2 * pi * r4);
   return z * sqrt(t) * m_lambda + m_mu;
 }
 
-vector MainDist::Xi(uint32_t size) const {
-  vector result(size);
+nstu::vector MainDist::Xi(uint32_t size) const {
+  nstu::vector result(size);
   for (auto& i : result) i = Xi();
   return result;
 }

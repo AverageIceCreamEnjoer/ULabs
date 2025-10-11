@@ -1,379 +1,122 @@
 #include "../lab1/header.h"
 #include "MainDist.hpp"
+#include "header.h"
 
 using namespace std;
-/*
+
+array_t vtoa(const nstu::vector& v) {
+  array_t arr;
+  arr.length = v.size();
+  arr.data = new ld[arr.length];
+  for (uint32_t i = 0; i < arr.length; ++i) {
+    arr.data[i] = v[i];
+  }
+  return arr;
+}
+
+nstu::vector atov(const array_t& arr) {
+  nstu::vector v(arr.length);
+  for (uint32_t i = 0; i < arr.length; ++i) {
+    v[i] = arr.data[i];
+  }
+  return v;
+}
+
 void testDistribution_3_1_1() {
   ld mu = 0, lambda = 1, nu = 1;
   ld x = 0;
-  Distribution dist;
-  initDistribution(dist, nu, mu, lambda);
-  ld density = densityDist(dist, x);
+  Distribution struct_dist;
+  initDistribution(struct_dist, nu, mu, lambda);
+  MainDist main_dist(nu, mu, lambda);
   cout << "-----Тест 3.1.1-----" << endl;
   cout << "Тест основного распределения:" << endl;
   cout << "nu = " << nu << ", mu = " << mu << ", lambda = " << lambda
        << ", x = " << x << endl;
-  cout << "Плотность вероятности f(x) = " << density << endl;
-  cout << "M = " << MDist(dist) << ", D = " << DDist(dist)
-       << ", G1 = " << G1Dist() << ", G2 = " << G2Dist(dist) << endl;
+  cout << "Плотность вероятности f(x): s" << densityDist(struct_dist, x)
+       << ", c" << main_dist.density(x) << endl;
+  cout << "M = s" << MDist(struct_dist) << ", c" << main_dist.M() << "; D = s"
+       << DDist(struct_dist) << ", c" << main_dist.D() << "; G1 = s" << G1Dist()
+       << ", c" << main_dist.G1() << "; G2 = s" << G2Dist(struct_dist) << ", c"
+       << main_dist.G2() << endl;
   auto fout = ofstream("test311.csv");
   fout << "x,f(x),xi,f(xi)" << endl;
   for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiDist(dist);
-    fout << i << "," << densityDist(dist, i) << "," << xi << ","
-         << densityDist(dist, xi) << endl;
+    ld xi = main_dist.Xi();
+    ld density = main_dist.density(i);
+    ld density_xi = main_dist.density(xi);
+    fout << i << "," << density << "," << xi << "," << density_xi << endl;
   }
 }
 
 void testDistribution_3_1_2() {
   ld mu = 0, lambda = 2, nu = 1;
   ld x = 0;
-  Distribution dist;
-  initDistribution(dist, nu, mu, lambda);
-  ld density = densityDist(dist, x);
+  Distribution struct_dist;
+  initDistribution(struct_dist, nu, mu, lambda);
+  MainDist main_dist(nu, mu, lambda);
   cout << "\n-----Тест 3.1.2-----" << endl;
   cout << "Тест основного распределения:" << endl;
   cout << "nu = " << nu << ", mu = " << mu << ", lambda = " << lambda
        << ", x = " << x << endl;
-  cout << "Плотность вероятности f(x) = " << density << endl;
-  cout << "M = " << MDist(dist) << ", D = " << DDist(dist)
-       << ", G1 = " << G1Dist() << ", G2 = " << G2Dist(dist) << endl;
+  cout << "Плотность вероятности f(x): s" << densityDist(struct_dist, x)
+       << ", c" << main_dist.density(x) << endl;
+  cout << "M = s" << MDist(struct_dist) << ", c" << main_dist.M() << "; D = s"
+       << DDist(struct_dist) << ", c" << main_dist.D() << "; G1 = s" << G1Dist()
+       << ", c" << main_dist.G1() << "; G2 = s" << G2Dist(struct_dist) << ", c"
+       << main_dist.G2() << endl;
   auto fout = ofstream("test312.csv");
   fout << "x,f(x),xi,f(xi)" << endl;
   for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiDist(dist);
-    fout << i << "," << densityDist(dist, i) << "," << xi << ","
-         << densityDist(dist, xi) << endl;
+    ld xi = main_dist.Xi();
+    ld density = main_dist.density(i);
+    ld density_xi = main_dist.density(xi);
+    fout << i << "," << density << "," << xi << "," << density_xi << endl;
   }
 }
 
 void testDistribution_3_1_3() {
   ld mu = 10, lambda = 2, nu = 1;
   ld x = 0;
-  Distribution dist;
-  initDistribution(dist, nu, mu, lambda);
-  ld density = densityDist(dist, x);
+  Distribution struct_dist;
+  initDistribution(struct_dist, nu, mu, lambda);
+  MainDist main_dist(nu, mu, lambda);
   cout << "\n-----Тест 3.1.3-----" << endl;
   cout << "Тест основного распределения:" << endl;
   cout << "nu = " << nu << ", mu = " << mu << ", lambda = " << lambda
        << ", x = " << x << endl;
-  cout << "Плотность вероятности f(x) = " << density << endl;
-  cout << "M = " << MDist(dist) << ", D = " << DDist(dist)
-       << ", G1 = " << G1Dist() << ", G2 = " << G2Dist(dist) << endl;
+  cout << "Плотность вероятности f(x): s" << densityDist(struct_dist, x)
+       << ", c" << main_dist.density(x) << endl;
+  cout << "M = s" << MDist(struct_dist) << ", c" << main_dist.M() << "; D = s"
+       << DDist(struct_dist) << ", c" << main_dist.D() << "; G1 = s" << G1Dist()
+       << ", c" << main_dist.G1() << "; G2 = s" << G2Dist(struct_dist) << ", c"
+       << main_dist.G2() << endl;
   auto fout = ofstream("test313.csv");
   fout << "x,f(x),xi,f(xi)" << endl;
-  for (ld i = -5; i <= 25; i += 0.5) {
-    auto xi = XiDist(dist);
-    fout << i << "," << densityDist(dist, i) << "," << xi << ","
-         << densityDist(dist, xi) << endl;
+  for (ld i = -15; i <= 15; i += 0.5) {
+    ld xi = main_dist.Xi();
+    ld density = main_dist.density(i);
+    ld density_xi = main_dist.density(xi);
+    fout << i << "," << density << "," << xi << "," << density_xi << endl;
   }
 }
 
-void testDistribution_3_2_1() {
-  ld mu1 = 10, mu2 = mu1, lambda1 = 2, lambda2 = lambda1, nu1 = 1, nu2 = nu1;
-  ld p = 0.5;
-  ld x = 0;
-  Mixture mixture;
-  initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
-  ld density = densityMixt(mixture, x);
-  cout << "\n-----Тест 3.2.1-----" << endl;
-  cout << "Тест распределения смеси:" << endl;
-  cout << "nu1 = " << nu1 << "mu1 = " << mu1 << ", lambda1 = " << lambda1
-       << '\n'
-       << "nu2 = " << nu2 << "mu2 = " << mu2 << ", lambda2 = " << lambda2
-       << '\n'
-       << "p = " << p << ", x = " << x << endl;
-  cout << "Плотность вероятности f(x) = " << density << endl;
-  cout << "M = " << MMixt(mixture) << ", D = " << DMixt(mixture)
-       << ", G1 = " << G1Mixt(mixture) << ", G2 = " << G2Mixt(mixture) << endl;
-  auto fout = ofstream("test321.csv");
-  fout << "x,f(x),xi,f(xi)" << endl;
-  for (ld i = -5; i <= 25; i += 0.5) {
-    auto xi = XiMixt(mixture);
-    fout << i << "," << densityMixt(mixture, i) << "," << xi << ","
-         << densityMixt(mixture, xi) << endl;
-  }
-}
-void testDistribution_3_2_2() {
-  ld mu1 = 0, mu2 = 7, lambda1 = 1, lambda2 = lambda1, nu1 = 1, nu2 = nu1;
-  ld p = 0.4;
-  ld x = 0;
-  Mixture mixture;
-  initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
-  ld density = densityMixt(mixture, x);
-  cout << "\n-----Тест 3.2.2-----" << endl;
-  cout << "Тест распределения смеси:" << endl;
-  cout << "nu1 = " << nu1 << "mu1 = " << mu1 << ", lambda1 = " << lambda1
-       << '\n'
-       << "nu2 = " << nu2 << "mu2 = " << mu2 << ", lambda2 = " << lambda2
-       << '\n'
-       << "p = " << p << ", x = " << x << endl;
-  cout << "Плотность вероятности f(x) = " << density << endl;
-  cout << "M = " << MMixt(mixture) << ", D = " << DMixt(mixture)
-       << ", G1 = " << G1Mixt(mixture) << ", G2 = " << G2Mixt(mixture) << endl;
-  auto fout = ofstream("test322.csv");
-  fout << "x,f(x),xi,f(xi)" << endl;
-  for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiMixt(mixture);
-    fout << i << "," << densityMixt(mixture, i) << "," << xi << ","
-         << densityMixt(mixture, xi) << endl;
-  }
-}
-
-void testDistribution_3_2_3() {
-  ld mu1 = 0, mu2 = mu1, lambda1 = 1, lambda2 = 3, nu1 = 1, nu2 = nu1;
-  ld p = 0.5;
-  ld x = 0;
-  Mixture mixture;
-  initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
-  ld density = densityMixt(mixture, x);
-  cout << "\n-----Тест 3.2.3-----" << endl;
-  cout << "Тест распределения смеси:" << endl;
-  cout << "nu1 = " << nu1 << "mu1 = " << mu1 << ", lambda1 = " << lambda1
-       << '\n'
-       << "nu2 = " << nu2 << "mu2 = " << mu2 << ", lambda2 = " << lambda2
-       << '\n'
-       << "p = " << p << ", x = " << x << endl;
-  cout << "Плотность вероятности f(x) = " << density << endl;
-  cout << "M = " << MMixt(mixture) << ", D = " << DMixt(mixture)
-       << ", G1 = " << G1Mixt(mixture) << ", G2 = " << G2Mixt(mixture) << endl;
-  auto fout = ofstream("test323.csv");
-  fout << "x,f(x),xi,f(xi)" << endl;
-  for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiMixt(mixture);
-    fout << i << "," << densityMixt(mixture, i) << "," << xi << ","
-         << densityMixt(mixture, xi) << endl;
-  }
-}
-
-void testDistribution_3_2_4() {
-  ld mu1 = 0, mu2 = mu1, lambda1 = 1, lambda2 = lambda1, nu1 = 0.1, nu2 = 30;
-  ld p = 0.5;
-  ld x = 0;
-  Mixture mixture;
-  initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
-  ld density = densityMixt(mixture, x);
-  cout << "\n-----Тест 3.2.4-----" << endl;
-  cout << "Тест распределения смеси:" << endl;
-  cout << "nu1 = " << nu1 << "mu1 = " << mu1 << ", lambda1 = " << lambda1
-       << '\n'
-       << "nu2 = " << nu2 << "mu2 = " << mu2 << ", lambda2 = " << lambda2
-       << '\n'
-       << "p = " << p << ", x = " << x << endl;
-  cout << "Плотность вероятности f(x) = " << density << endl;
-  cout << "M = " << MMixt(mixture) << ", D = " << DMixt(mixture)
-       << ", G1 = " << G1Mixt(mixture) << ", G2 = " << G2Mixt(mixture) << endl;
-  auto fout = ofstream("test324.csv");
-  fout << "x,f(x),xi,f(xi)" << endl;
-  for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiMixt(mixture);
-    fout << i << "," << densityMixt(mixture, i) << "," << xi << ","
-         << densityMixt(mixture, xi) << endl;
-  }
-}
-
-void testDistribution_3_3_1_1() {
-  ld mu = 0, lambda = 1, nu = 1;
-  ld x = 0;
-  uint32_t n = 10000;
-  Distribution dist;
-  initDistribution(dist, nu, mu, lambda);
-  EmpiricDist emp;
-  auto arr = XiDistArray(dist, n);
-  initEmpiric(emp, arr);
-  cout << "\n-----Тест 3.3.1.1-----" << endl;
-  cout << "Тест эмпирического распределения:" << endl;
-  cout << "Распределение построено на основе выборки " << n
-       << " элементов из основного распределения со следующими параметрами:"
-       << endl;
-  cout << "nu = " << nu << ", mu = " << mu << ", lambda = " << lambda << endl;
-  cout << "Выборка:\nf(0) = " << densityDist(dist, x);
-  cout << ", M = " << MDist(dist) << ", D = " << DDist(dist)
-       << ", G1 = " << G1Dist() << ", G2 = " << G2Dist(dist) << endl;
-  cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
-  cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
-       << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
-  auto fout = ofstream("test3311.csv");
-  fout << "x,f(x),fe(x),xi,fe(xi)" << endl;
-  for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiEmp(emp);
-    fout << i << "," << densityDist(dist, i) << "," << densityEmp(emp, i) << ","
-         << xi << "," << densityEmp(emp, xi) << endl;
-  }
-  delete[] arr.data;
-  delete[] emp.X.data;
-  delete[] emp.n;
-  delete[] emp.xi.data;
-}
-
-void testDistribution_3_3_1_2() {
-  ld mu = 10, lambda = 2, nu = 3;
-  ld x = 0;
-  uint32_t n = 10000;
-  Distribution dist;
-  initDistribution(dist, nu, mu, lambda);
-  EmpiricDist emp;
-  auto arr = XiDistArray(dist, n);
-  initEmpiric(emp, arr);
-  cout << "\n-----Тест 3.3.1.2-----" << endl;
-  cout << "Тест эмпирического распределения:" << endl;
-  cout << "Распределение построено на основе выборки " << n
-       << " элементов из основного распределения со следующими параметрами:"
-       << endl;
-  cout << "nu = " << nu << ", mu = " << mu << ", lambda = " << lambda << endl;
-  cout << "Выборка:\nf(0) = " << densityDist(dist, x);
-  cout << ", M = " << MDist(dist) << ", D = " << DDist(dist)
-       << ", G1 = " << G1Dist() << ", G2 = " << G2Dist(dist) << endl;
-  cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
-  cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
-       << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
-  auto fout = ofstream("test3312.csv");
-  fout << "x,f(x),fe(x),xi,fe(xi)" << endl;
-  for (ld i = -5; i <= 25; i += 0.5) {
-    auto xi = XiEmp(emp);
-    fout << i << "," << densityDist(dist, i) << "," << densityEmp(emp, i) << ","
-         << xi << "," << densityEmp(emp, xi) << endl;
-  }
-  delete[] arr.data;
-  delete[] emp.X.data;
-  delete[] emp.n;
-  delete[] emp.xi.data;
-}
-
-void testDistribution_3_3_1_3() {
-  ld mu1 = 0, mu2 = mu1, lambda1 = 1, lambda2 = 2, nu1 = 1, nu2 = nu1;
-  ld x = 0, p = 0.5;
-  uint32_t n = 10000;
-  Mixture mixture;
-  initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
-  EmpiricDist emp;
-  auto arr = XiMixtArray(mixture, n);
-  initEmpiric(emp, arr);
-  cout << "\n-----Тест 3.3.1.3-----" << endl;
-  cout << "Тест эмпирического распределения:" << endl;
-  cout << "Распределение построено на основе выборки " << n
-       << " элементов из распределения смеси со следующими параметрами:"
-       << endl;
-  cout << "nu1 = " << nu1 << "mu1 = " << mu1 << ", lambda1 = " << lambda1
-       << '\n'
-       << "nu2 = " << nu2 << "mu2 = " << mu2 << ", lambda2 = " << lambda2
-       << '\n'
-       << "p = " << p << endl;
-  cout << "Выборка:\nf(0) = " << densityMixt(mixture, x);
-  cout << ", M = " << MMixt(mixture) << ", D = " << DMixt(mixture)
-       << ", G1 = " << G1Mixt(mixture) << ", G2 = " << G2Mixt(mixture) << endl;
-  cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
-  cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
-       << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
-  auto fout = ofstream("test3313.csv");
-  fout << "x,f(x),fe(x),xi,fe(xi)" << endl;
-  for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiEmp(emp);
-    fout << i << "," << densityMixt(mixture, i) << "," << densityEmp(emp, i)
-         << "," << xi << "," << densityEmp(emp, xi) << endl;
-  }
-  delete[] arr.data;
-  delete[] emp.X.data;
-  delete[] emp.n;
-  delete[] emp.xi.data;
-}
-void testDistribution_3_3_1_4() {
-  ld mu1 = 0, mu2 = 3, lambda1 = 1, lambda2 = 2, nu1 = 1, nu2 = 3;
-  ld x = 0, p = 0.4;
-  uint32_t n = 10000;
-  Mixture mixture;
-  initMixture(mixture, nu1, mu1, lambda1, nu2, mu2, lambda2, p);
-  EmpiricDist emp;
-  auto arr = XiMixtArray(mixture, n);
-  initEmpiric(emp, arr);
-  cout << "\n-----Тест 3.3.1.4-----" << endl;
-  cout << "Тест эмпирического распределения:" << endl;
-  cout << "Распределение построено на основе выборки " << n
-       << " элементов из распределения смеси со следующими параметрами:"
-       << endl;
-  cout << "nu1 = " << nu1 << "mu1 = " << mu1 << ", lambda1 = " << lambda1
-       << '\n'
-       << "nu2 = " << nu2 << "mu2 = " << mu2 << ", lambda2 = " << lambda2
-       << '\n'
-       << "p = " << p << endl;
-  cout << "Выборка:\nf(0) = " << densityMixt(mixture, x);
-  cout << ", M = " << MMixt(mixture) << ", D = " << DMixt(mixture)
-       << ", G1 = " << G1Mixt(mixture) << ", G2 = " << G2Mixt(mixture) << endl;
-  cout << "Эмпирическое распределение:\nf(0) = " << densityEmp(emp, x);
-  cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
-       << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
-  auto fout = ofstream("test3314.csv");
-  fout << "x,f(x),fe(x),xi,fe(xi)" << endl;
-  for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiEmp(emp);
-    fout << i << "," << densityMixt(mixture, i) << "," << densityEmp(emp, i)
-         << "," << xi << "," << densityEmp(emp, xi) << endl;
-  }
-  delete[] arr.data;
-  delete[] emp.X.data;
-  delete[] emp.n;
-  delete[] emp.xi.data;
-}
-
-void testDistribution_3_3_2() {
-  ld mu = 0, lambda = 1, nu = 1;
-  ld x = 0;
-  uint32_t n = 10000;
-  Distribution dist;
-  initDistribution(dist, nu, mu, lambda);
-  EmpiricDist emp;
-  auto arr = XiDistArray(dist, n);
-  initEmpiric(emp, arr);
-  delete[] arr.data;
-  cout << "\n-----Тест 3.3.2-----" << endl;
-  cout << "Тест эмпирического распределения:" << endl;
-  cout << "Распределение построено на основе выборки " << n
-       << " элементов из основного распределения со следующими параметрами:"
-       << endl;
-  cout << "nu = " << nu << ", mu = " << mu << ", lambda = " << lambda << endl;
-  cout << "Выборка:\nf(0) = " << densityDist(dist, x);
-  cout << ", M = " << MDist(dist) << ", D = " << DDist(dist)
-       << ", G1 = " << G1Dist() << ", G2 = " << G2Dist(dist) << endl;
-  cout << "Эмпирическое распределение1:\nf(0) = " << densityEmp(emp, x);
-  cout << ", M = " << MEmp(emp) << ", D = " << DEmp(emp)
-       << ", G1 = " << G1Emp(emp) << ", G2 = " << G2Emp(emp) << endl;
-  EmpiricDist emp2;
-  auto arr2 = XiEmpArray(emp, n);
-  initEmpiric(emp2, arr2);
-  cout << "Эмпирическое распределение2:\nf(0) = " << densityEmp(emp2, x);
-  cout << ", M = " << MEmp(emp2) << ", D = " << DEmp(emp2)
-       << ", G1 = " << G1Emp(emp2) << ", G2 = " << G2Emp(emp2) << endl;
-  auto fout = ofstream("test332.csv");
-  fout << "x,f(x),fe(x),xi,fe(xi),fee(x),xie,fee(xie)" << endl;
-  for (ld i = -15; i <= 15; i += 0.5) {
-    auto xi = XiEmp(emp);
-    auto xie = XiEmp(emp2);
-    fout << i << "," << densityDist(dist, i) << "," << densityEmp(emp, i) << ","
-         << xi << "," << densityEmp(emp, xi) << "," << densityEmp(emp2, i)
-         << "," << xie << "," << densityEmp(emp2, xie) << endl;
-  }
-  delete[] arr2.data;
-  delete[] emp.X.data;
-  delete[] emp.n;
-  delete[] emp.xi.data;
-  delete[] emp2.X.data;
-  delete[] emp2.n;
-  delete[] emp2.xi.data;
-}
-*/
 void testVariantTable() {
   ld mu = 0, lambda = 1;
   ld nuarr[] = {0.1, 0.5, 1, 2, 3, 5, 10, 30};
   cout << "--------------------------------------------" << endl;
   cout << "Тестирование значений из таблицы в варианте:" << endl;
   for (ld nu : nuarr) {
-    MainDist dist(nu, mu, lambda);
-    cout << " D = " << dist.D() << " G2 = " << dist.G2()
-         << " f(0) = " << dist.density(0) << endl;
+    MainDist struct_dist(nu, mu, lambda);
+    cout << " D = " << struct_dist.D() << " G2 = " << struct_dist.G2()
+         << " f(0) = " << struct_dist.density(0) << endl;
   }
 }
 
 int main() {
+  nstu::randNum(5);
   testVariantTable();
+  testDistribution_3_1_1();
+  testDistribution_3_1_2();
+  testDistribution_3_1_3();
   return 0;
 }

@@ -5,11 +5,18 @@
 
 using ld = long double;
 
-inline ld _randNum() {
+namespace nstu {
+
+inline ld randNum(uint32_t seed = 0) {
+  static bool initialized = false;
+  if (!initialized) {
+    srand(seed);
+    initialized = true;
+  }
   ld r;
   do {
     r = static_cast<ld>(rand()) / RAND_MAX;
-  } while (r == 0. || r == 1.);
+  } while (r == 0 || r == 1);
   return r;
 }
 
@@ -217,3 +224,5 @@ class vector {
 
   ~vector() {}
 };
+
+}  // namespace nstu

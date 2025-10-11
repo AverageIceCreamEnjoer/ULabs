@@ -29,11 +29,11 @@ class MainDist {
   void setLambda(ld lambda) noexcept;
 
   ld density(ld x) const noexcept;
-  vector density(const vector& x) const;
+  nstu::vector density(const nstu::vector& x) const;
   ld M() const noexcept;
   ld D() const noexcept;
   ld G1() const noexcept;
   ld G2() const noexcept;
   ld Xi() const noexcept;
-  vector Xi(uint32_t size) const;
+  nstu::vector Xi(uint32_t size) const;
 };
