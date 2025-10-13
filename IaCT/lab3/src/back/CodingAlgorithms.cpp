@@ -41,32 +41,27 @@ QString CodingAlgorithms::stringToBits(const QString &text) {
       qWarning() << "символ не из алфавита:" << ch;
       return "";
     }
-    int index = m_charToIndex[ch];
-    // Преобразуем индекс в n-битную двоичную строку
-    bits.append(QString::number(index, 2).rightJustified(m_bitSymbolSize, '0'));
+    bits.append(m_encodedAlphabet[m_charToIndex[ch]]);
   }
   return bits;
 }
 
 QString CodingAlgorithms::bitsToString(const QString &bits) {
   QString text = "";
+  if (bits.length() % m_bitSymbolSize != 0) {
+    qWarning() << "Неверная длина последовательности бит. Должна делиться на "
+                  "m_bitSymbolSize ="
+               << m_bitSymbolSize;
+    return "";
+  }
   for (int i = 0; i < bits.length(); i += m_bitSymbolSize) {
-    if (i + m_bitSymbolSize > bits.length()) {
-      qWarning() << "Неверная длина последовательности бит. Должна делиться на "
-                    "m_bitSymbolSize ="
-                 << m_bitSymbolSize;
-      break;
-    }
-    QString threeBits = bits.mid(i, m_bitSymbolSize);
-    bool ok;
-    int index = threeBits.toInt(&ok, 2);
-    if (ok && index < m_alphabet.length()) {
-      text.append(m_alphabet[index]);
-    } else {
+    QString ch = bits.mid(i, m_bitSymbolSize);
+    if (!m_encodedCharToIndex.contains(ch)) {
       qWarning()
           << "Не получилось конвертировать последовательность бит в символ:"
-          << threeBits;
-    }
+          << ch;
+    } else
+      text.append(m_alphabet[m_encodedCharToIndex[ch]]);
   }
   return text;
 }
@@ -74,7 +69,6 @@ QString CodingAlgorithms::bitsToString(const QString &bits) {
 QString CodingAlgorithms::doubleToBinaryString(double value, int precision) {
   QString bits = "";
   double current = value;
-
   for (int i = 0; i < precision; ++i) {
     current *= 2.0;
     if (current >= 1.0) {
@@ -115,28 +109,33 @@ bool CodingAlgorithms::encodeGilbertMoore(const QString &inputFilePath,
     return false;
   }
   qInfo() << "Сообщение для кодирования:" << message;
-  QString binaryCode = "";
-  for (int i = 0; i < message.length(); i += 2) {
-    QString ch = message.mid(i, 2);
-    if (!m_charToIndex.contains(ch)) {
-      qWarning() << "Сообщение содержит символ не из алфавита:" << ch;
+  QString binaryCode = stringToBits(message); /*
+   for (int i = 0; i < message.length(); i += 2) {
+     QString ch = message.mid(i, 2);
+     if (!m_charToIndex.contains(ch)) {
+       qWarning() << "Сообщение содержит символ не из алфавита:" << ch;
+       return false;
+     }
+     binaryCode.append(m_encodedAlphabet[m_charToIndex[ch]]);
+   }*/
+  if (!binaryCode.isEmpty()) {
+    QFile outputFile(outputFilePath);
+    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      qWarning() << "Невозможно открыть файл для записи:" << outputFilePath;
       return false;
     }
-    binaryCode.append(m_encodedAlphabet[m_charToIndex[ch]]);
-  }
-  QFile outputFile(outputFilePath);
-  if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qWarning() << "Невозможно открыть файл для записи:" << outputFilePath;
+    QTextStream out(&outputFile);
+    out << binaryCode << "\n";
+    out << message.length() / 2 << "\n";
+    outputFile.close();
+
+    qInfo() << "Сообщение закодировано в" << binaryCode << "и сохранено в"
+            << outputFilePath;
+    return true;
+  } else {
+    qWarning() << "Невозможно закодировать сообщение:" << message;
     return false;
   }
-  QTextStream out(&outputFile);
-  out << binaryCode << "\n";
-  out << message.length() / 2 << "\n";
-  outputFile.close();
-
-  qInfo() << "Сообщение закодировано в" << binaryCode << "и сохранено в"
-          << outputFilePath;
-  return true;
 }
 
 bool CodingAlgorithms::decodeGilbertMoore(const QString &inputFilePath,
@@ -151,27 +150,31 @@ bool CodingAlgorithms::decodeGilbertMoore(const QString &inputFilePath,
   int messageLength = in.readLine().toInt();
   inputFile.close();
   qInfo() << "Decoding code:" << binaryCode << "with length:" << messageLength;
-  QString decodedMessage = "";
-  // Декодирование
-  for (int i = 0; i < messageLength; ++i) {
-    // Ищем, в какой подынтервал попадает текущий код
-    QString ch = binaryCode.mid(i * m_bitSymbolSize, m_bitSymbolSize);
-    decodedMessage.append(m_alphabet[m_encodedCharToIndex[ch]]);
-  }
-
-  QFile outputFile(outputFilePath);
-  if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qWarning() << "Cannot open output file for decoded message:"
-               << outputFilePath;
+  QString decodedMessage = bitsToString(binaryCode); /*
+   // Декодирование
+   for (int i = 0; i < messageLength; ++i) {
+     // Ищем, в какой подынтервал попадает текущий код
+     QString ch = binaryCode.mid(i * m_bitSymbolSize, m_bitSymbolSize);
+     decodedMessage.append(m_alphabet[m_encodedCharToIndex[ch]]);
+   }
+ */
+  if (!decodedMessage.isEmpty()) {
+    QFile outputFile(outputFilePath);
+    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      qWarning() << "Cannot open output file for decoded message:"
+                 << outputFilePath;
+      return false;
+    }
+    QTextStream out(&outputFile);
+    out << decodedMessage;
+    outputFile.close();
+    qInfo() << "Decoded message:" << decodedMessage << "and saved to"
+            << outputFilePath;
+    return true;
+  } else {
+    qWarning() << "Decoded failded:" << binaryCode;
     return false;
   }
-  QTextStream out(&outputFile);
-  out << decodedMessage;
-  outputFile.close();
-
-  qInfo() << "Decoded message:" << decodedMessage << "and saved to"
-          << outputFilePath;
-  return true;
 }
 
 bool CodingAlgorithms::encodeParity(const QString &inputFilePath,
