@@ -118,7 +118,7 @@ ApplicationWindow {
             Layout.topMargin: 10
             onClicked: {
                 // Вызываем C++ метод!
-                var success = coder.encodeFile(encodeInputPath.text, encodeOutputPath.text);
+                var success = coder.encodeGilbertMoore(encodeInputPath.text, encodeOutputPath.text);
                 if (success) {
                     statusLabel.text = "Успешно закодировано!";
                     statusLabel.color = "green";
@@ -180,7 +180,7 @@ ApplicationWindow {
             Layout.topMargin: 10
             onClicked: {
                 // Вызываем C++ метод!
-                var success = coder.decodeFile(decodeInputPath.text, decodeOutputPath.text);
+                var success = coder.decodeGilbertMoore(decodeInputPath.text, decodeOutputPath.text);
                 if (success) {
                     statusLabel.text = "Успешно декодировано!";
                     statusLabel.color = "green";

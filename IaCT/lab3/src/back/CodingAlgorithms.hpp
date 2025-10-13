@@ -24,9 +24,14 @@ class CodingAlgorithms : public QObject {
   void initialize();
   QString stringToBits(const QString &text);
   QString bitsToString(const QString &bits);
+  QString doubleToBinaryString(double value, int precision);
+  double binaryStringToDouble(const QString &bits);
 
-  QString m_alphabet;
+  QVector<QString> m_alphabet;
+  uint32_t m_bitSymbolSize;
   QVector<double> m_probabilities;
   QVector<double> m_cumulativeProbabilities;
-  QMap<QChar, int> m_charToIndex;
+  QMap<QString, int> m_charToIndex;
+  QVector<QString> m_encodedAlphabet;
+  QMap<QString, int> m_encodedCharToIndex;
 };
