@@ -2,7 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
 
-#include "back/GilbertMooreCoder.hpp"
+#include "back/CodingAlgorithms.hpp"
 
 int main(int argc, char *argv[]) {
   // Другие варианты: "Material", "Universal", "Imagine"
@@ -12,8 +12,8 @@ int main(int argc, char *argv[]) {
 
   // Регистрируем наш C++ тип для использования в QML
   // qmlRegisterType<ClassName>("URI", major_ver, minor_ver, "QmlName");
-  qmlRegisterType<GilbertMooreCoder>("com.mycompany.coding", 1, 0,
-                                     "GilbertMooreCoder");
+  qmlRegisterType<CodingAlgorithms>("com.mycompany.coding", 1, 0,
+                                    "CodingAlgorithms");
 
   // Создаем движок QML
   QQmlApplicationEngine engine;

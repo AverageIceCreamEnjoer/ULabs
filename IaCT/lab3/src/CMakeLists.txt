@@ -27,8 +27,8 @@ find_package(Qt6 COMPONENTS Core Gui Quick QuickControls2 QuickDialogs2 REQUIRED
 # Создаем исполняемый файл (наше приложение)
 qt_add_executable(iact3
     main.cpp
-    back/GilbertMooreCoder.hpp
-    back/GilbertMooreCoder.cpp
+    back/CodingAlgorithms.hpp
+    back/CodingAlgorithms.cpp
     front/resources.qrc
 )
 

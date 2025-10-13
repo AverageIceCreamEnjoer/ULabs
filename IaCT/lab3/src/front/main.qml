@@ -22,7 +22,7 @@ ApplicationWindow {
 
     // Создаем экземпляр нашего C++ объекта.
     // Теперь мы можем обращаться к нему по id: coder
-    GilbertMooreCoder {
+    CodingAlgorithms {
         id: coder
     }
 
@@ -187,6 +187,70 @@ ApplicationWindow {
                 } else {
                     statusLabel.text = "Декодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
                     statusLabel.color = "red";
+                }
+            }
+        }
+
+        GroupBox {
+            title: "Проверка на четность"
+            Layout.fillWidth: true
+            Layout.topMargin: 15 // Небольшой отступ сверху
+
+            GridLayout {
+                columns: 3
+                width: parent.width
+
+                // Поля для кодирования
+                Label {
+                    text: "Входной файл:"
+                }
+                TextField {
+                    id: parityInputPath
+                    Layout.fillWidth: true
+                }
+                Button {
+                    text: "Выбрать..."
+                    onClicked: {
+                        openDialog.sourceTextField = parityInputPath;
+                        openDialog.open();
+                    }
+                }
+
+                Label {
+                    text: "Выходной файл:"
+                }
+                TextField {
+                    id: parityOutputPath
+                    Layout.fillWidth: true
+                }
+                Button {
+                    text: "Выбрать..."
+                    onClicked: {
+                        saveDialog.sourceTextField = parityOutputPath;
+                        saveDialog.open();
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 10
+
+            Button {
+                text: "Кодирование с проверкой на четность"
+                onClicked: {
+                    var success = coder.encodeParity(parityInputPath.text, parityOutputPath.text);
+                    statusLabel.text = success ? "Кодирование с проверкой на четность прошло успепшно!" : "Кодирование с проверкой на четность завершилось с ошибкой.";
+                    statusLabel.color = success ? "green" : "red";
+                }
+            }
+            Button {
+                text: "Декодирование с проверкой на четность"
+                onClicked: {
+                    var success = coder.decodeParity(parityInputPath.text, parityOutputPath.text);
+                    statusLabel.text = success ? "Декодирование с проверкой на четность прошло успешно!" : "Декодирование с проверкой на четность завершилось с ошибкой.";
+                    statusLabel.color = success ? "green" : "red";
                 }
             }
         }
