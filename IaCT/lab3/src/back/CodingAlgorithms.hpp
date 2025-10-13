@@ -26,6 +26,7 @@ class CodingAlgorithms : public QObject {
   QString bitsToString(const QString &bits);
   QString doubleToBinaryString(double value, int precision);
   double binaryStringToDouble(const QString &bits);
+  QString XOR(const QString &a, const QString &b);
 
   QVector<QString> m_alphabet;
   uint32_t m_bitSymbolSize;

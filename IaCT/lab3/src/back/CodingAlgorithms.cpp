@@ -66,6 +66,19 @@ QString CodingAlgorithms::bitsToString(const QString &bits) {
   return text;
 }
 
+QString CodingAlgorithms::XOR(const QString &a, const QString &b) {
+  if (a.length() != b.length()) {
+    qWarning() << "Длины строк для XOR не совпадают:" << a.length()
+               << "!=" << b.length();
+    return "";
+  }
+  QString result;
+  for (int i = 0; i < a.length(); ++i) {
+    result.append((a[i] == b[i]) ? '0' : '1');
+  }
+  return result;
+}
+
 QString CodingAlgorithms::doubleToBinaryString(double value, int precision) {
   QString bits = "";
   double current = value;
@@ -194,30 +207,18 @@ bool CodingAlgorithms::encodeParity(const QString &inputFilePath,
   // Проверяем, является ли длина битовой последовательности четной или нечетной
   if (bits.length() % 2 == 0) {
     // Правило для четной длины: блоки по 2 бита
-    for (int i = 0; i < bits.length(); i += 2) {
-      int b1 = bits[i].digitValue();
-      int b2 = bits[i + 1].digitValue();
-      int parity = b1 ^ b2;  // XOR
-      encodedBits.append(QString::number(b1));
-      encodedBits.append(QString::number(b2));
-      encodedBits.append(QString::number(parity));
+    for (int i = 0; i < bits.length() - 1; i += 2) {
+      auto b1 = bits[i];
+      auto b2 = bits[i + 1];
+      auto parity = XOR(b1, b2);
+      encodedBits.append(b1);
+      encodedBits.append(b2);
+      encodedBits.append(parity);
     }
   } else {
     // Правило для нечетной длины: блоки по 3 бита
-    for (int i = 0; i < bits.length(); i += 3) {
-      if (i + 2 >= bits.length()) {
-        encodedBits.append(bits.mid(i));
-        break;
-      }
-      int b1 = bits[i].digitValue();
-      int b2 = bits[i + 1].digitValue();
-      int b3 = bits[i + 2].digitValue();
-      int parity = b1 ^ b2 ^ b3;
-      encodedBits.append(QString::number(b1));
-      encodedBits.append(QString::number(b2));
-      encodedBits.append(QString::number(b3));
-      encodedBits.append(QString::number(parity));
-    }
+    qWarning() << "Ошибка: Допускается кодирование блоками по"
+               << m_bitSymbolSize << "бита (четной длины).";
   }
 
   QFile outputFile(outputFilePath);
@@ -228,7 +229,7 @@ bool CodingAlgorithms::encodeParity(const QString &inputFilePath,
   QTextStream out(&outputFile);
   out << encodedBits << "\n";
   // Сохраняем исходную длину битов, это критично для декодера!
-  out << bits.length() << "\n";
+  out << bits.length() / m_bitSymbolSize << "\n";
   outputFile.close();
   qInfo() << "Кодирование с проверкой на четность прошло успешно.";
   return true;
@@ -249,51 +250,37 @@ bool CodingAlgorithms::decodeParity(const QString &inputFilePath,
   QString decodedBits = "";
   QString errorLog = "";
 
-  if (originalBitLength % 2 == 0) {
-    // Декодируем блоки по 3 бита
-    for (int i = 0; i < encodedBits.length(); i += 3) {
-      int b1 = encodedBits[i].digitValue();
-      int b2 = encodedBits[i + 1].digitValue();
-      int p = encodedBits[i + 2].digitValue();
+  if (encodedBits.length() % 3 == 0) {
+    for (int i = 0; i < encodedBits.length() - 2; i += 3) {
+      auto b1 = encodedBits[i];
+      auto b2 = encodedBits[i + 1];
+      auto p = encodedBits[i + 2];
 
-      if ((b1 ^ b2) != p) {
+      if (XOR(b1, b2) != p) {
         errorLog.append(QString("Замечена ошибка в блоке %1.\n").arg(i));
       }
       // Даже если есть ошибка, мы все равно пытаемся раскодировать, как требует
       // задание
-      decodedBits.append(QString::number(b1));
-      decodedBits.append(QString::number(b2));
+      decodedBits.append(b1);
+      decodedBits.append(b2);
     }
   } else {
-    // Декодируем блоки по 4 бита
-    for (int i = 0; i < encodedBits.length();) {
-      if (decodedBits.length() + 3 >
-          originalBitLength) {  // Проверяем неполный блок в конце
-        decodedBits.append(encodedBits.mid(i));
-        break;
-      }
-      int b1 = encodedBits[i].digitValue();
-      int b2 = encodedBits[i + 1].digitValue();
-      int b3 = encodedBits[i + 2].digitValue();
-      int p = encodedBits[i + 3].digitValue();
-
-      if ((b1 ^ b2 ^ b3) != p) {
-        errorLog.append(QString("Замечена ошибка в блоке %1.\n").arg(i));
-      }
-      decodedBits.append(QString::number(b1));
-      decodedBits.append(QString::number(b2));
-      decodedBits.append(QString::number(b3));
-      i += 4;
-    }
+    qWarning() << "Ошибка: Допускается кодирование блоками по"
+               << m_bitSymbolSize << "бита (четной длины).";
+    return false;
   }
-
+  auto decodedMessage = bitsToString(decodedBits);
+  if (decodedMessage.length() / 2 != originalBitLength) {
+    errorLog.append(
+        "Длина раскодированного сообщения не совпадает с оригинальной.\n");
+  }
   // Запись раскодированного сообщения
   QFile decodedFile(outputFilePath);
   if (!decodedFile.open(QIODevice::WriteOnly | QIODevice::Text)) { /*...*/
     return false;
   }
   QTextStream outDecoded(&decodedFile);
-  outDecoded << bitsToString(decodedBits);
+  outDecoded << decodedMessage;
   decodedFile.close();
 
   if (errorLog.isEmpty()) {
