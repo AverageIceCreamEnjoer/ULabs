@@ -16,8 +16,8 @@ class CodingAlgorithms : public QObject {
                                       const QString &outputFilePath);
   Q_INVOKABLE bool encodeParity(const QString &inputFilePath,
                                 const QString &outputFilePath);
-  Q_INVOKABLE bool decodeParity(const QString &inputFilePath,
-                                const QString &outputFilePath);
+  Q_INVOKABLE QString decodeParity(const QString &inputFilePath,
+                                   const QString &outputFilePath);
 
  private:
   // инициализация алфавита и вероятностей

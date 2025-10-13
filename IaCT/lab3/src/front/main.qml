@@ -66,10 +66,12 @@ ApplicationWindow {
         id: rootLayout
         anchors.fill: parent
         anchors.margins: 10
+        Layout.rightMargin: 30
+        Layout.leftMargin: 30
 
         // --- Секция кодирования ---
         GroupBox {
-            title: "Кодирование"
+            title: "Кодирование без проверки"
             Layout.fillWidth: true
 
             GridLayout {
@@ -111,82 +113,24 @@ ApplicationWindow {
             }
         }
 
-        Button {
-            id: encodeButton
-            text: "Кодировать"
+        RowLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 10
-            onClicked: {
-                // Вызываем C++ метод!
-                var success = coder.encodeGilbertMoore(encodeInputPath.text, encodeOutputPath.text);
-                if (success) {
-                    statusLabel.text = "Успешно закодировано!";
-                    statusLabel.color = "green";
-                } else {
-                    statusLabel.text = "Кодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
-                    statusLabel.color = "red";
+
+            Button {
+                text: "Кодировать"
+                onClicked: {
+                    var success = coder.encodeGilbertMoore(encodeInputPath.text, encodeOutputPath.text);
+                    statusLabel.text = success ? "Успешно закодировано!" : "Кодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
+                    statusLabel.color = success ? "green" : "red";
                 }
             }
-        }
-
-        // --- Секция декодирования ---
-        GroupBox {
-            title: "Декодирование"
-            Layout.fillWidth: true
-            Layout.topMargin: 20
-
-            GridLayout {
-                columns: 3
-                width: parent.width
-
-                Label {
-                    text: "Входной файл:"
-                }
-                TextField {
-                    id: decodeInputPath
-                    Layout.fillWidth: true
-                    placeholderText: "Выбрать файл для декодирования..."
-                }
-                Button {
-                    text: "Выбрать..."
-                    onClicked: {
-                        openDialog.sourceTextField = decodeInputPath;
-                        openDialog.open();
-                    }
-                }
-
-                Label {
-                    text: "Выходной файл:"
-                }
-                TextField {
-                    id: decodeOutputPath
-                    Layout.fillWidth: true
-                    placeholderText: "Выбрать куда сохранить выходной файл..."
-                }
-                Button {
-                    text: "Выбрать..."
-                    onClicked: {
-                        saveDialog.sourceTextField = decodeOutputPath;
-                        saveDialog.open();
-                    }
-                }
-            }
-        }
-
-        Button {
-            id: decodeButton
-            text: "Декодировать"
-            Layout.alignment: Qt.AlignHCenter
-            Layout.topMargin: 10
-            onClicked: {
-                // Вызываем C++ метод!
-                var success = coder.decodeGilbertMoore(decodeInputPath.text, decodeOutputPath.text);
-                if (success) {
-                    statusLabel.text = "Успешно декодировано!";
-                    statusLabel.color = "green";
-                } else {
-                    statusLabel.text = "Декодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
-                    statusLabel.color = "red";
+            Button {
+                text: "Декодировать"
+                onClicked: {
+                    var success = coder.decodeGilbertMoore(encodeInputPath.text, encodeOutputPath.text);
+                    statusLabel.text = success ? "Успешно декодировано!" : "Декодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
+                    statusLabel.color = success ? "green" : "red";
                 }
             }
         }
@@ -207,6 +151,7 @@ ApplicationWindow {
                 TextField {
                     id: parityInputPath
                     Layout.fillWidth: true
+                    placeholderText: "Выбрать входной файл для чтения..."
                 }
                 Button {
                     text: "Выбрать..."
@@ -222,6 +167,7 @@ ApplicationWindow {
                 TextField {
                     id: parityOutputPath
                     Layout.fillWidth: true
+                    placeholderText: "Выбрать куда сохранить выходной файл..."
                 }
                 Button {
                     text: "Выбрать..."
@@ -230,12 +176,26 @@ ApplicationWindow {
                         saveDialog.open();
                     }
                 }
+                Label {
+                    text: "Лог ошибок:"
+                    font.bold: true
+                    Layout.topMargin: 10
+                }
+                TextArea {
+                    id: parityErrorArea
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 80
+                    readOnly: true
+                    placeholderText: "Здесь будут отображаться ошибки декодирования..."
+                }
             }
         }
 
         RowLayout {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 10
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
 
             Button {
                 text: "Кодирование с проверкой на четность"
@@ -248,9 +208,10 @@ ApplicationWindow {
             Button {
                 text: "Декодирование с проверкой на четность"
                 onClicked: {
-                    var success = coder.decodeParity(parityInputPath.text, parityOutputPath.text);
-                    statusLabel.text = success ? "Декодирование с проверкой на четность прошло успешно!" : "Декодирование с проверкой на четность завершилось с ошибкой.";
-                    statusLabel.color = success ? "green" : "red";
+                    var errorLog = coder.decodeParity(parityInputPath.text, parityOutputPath.text);
+                    parityErrorArea.text = errorLog;
+                    statusLabel.text = errorLog != "false" ? "Декодирование с проверкой на четность прошло успешно!" : "Декодирование с проверкой на четность завершилось с ошибкой.";
+                    statusLabel.color = errorLog != "false" ? "green" : "red";
                 }
             }
         }
@@ -260,6 +221,7 @@ ApplicationWindow {
             id: statusLabel
             Layout.fillWidth: true
             Layout.topMargin: 15
+            Layout.bottomMargin: 15
             horizontalAlignment: Text.AlignHCenter
             font.bold: true
             text: "Готово"

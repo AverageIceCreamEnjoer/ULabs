@@ -235,12 +235,12 @@ bool CodingAlgorithms::encodeParity(const QString &inputFilePath,
   return true;
 }
 
-bool CodingAlgorithms::decodeParity(const QString &inputFilePath,
-                                    const QString &outputFilePath) {
+QString CodingAlgorithms::decodeParity(const QString &inputFilePath,
+                                       const QString &outputFilePath) {
   QFile inputFile(inputFilePath);
   if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qWarning() << "Невозможно открыть файл для чтения:" << inputFilePath;
-    return false;
+    return "false";
   }
   QTextStream in(&inputFile);
   QString encodedBits = in.readLine();
@@ -267,7 +267,7 @@ bool CodingAlgorithms::decodeParity(const QString &inputFilePath,
   } else {
     qWarning() << "Ошибка: Допускается кодирование блоками по"
                << m_bitSymbolSize << "бита (четной длины).";
-    return false;
+    return "false";
   }
   auto decodedMessage = bitsToString(decodedBits);
   if (decodedMessage.length() / 2 != originalBitLength) {
@@ -277,17 +277,14 @@ bool CodingAlgorithms::decodeParity(const QString &inputFilePath,
   // Запись раскодированного сообщения
   QFile decodedFile(outputFilePath);
   if (!decodedFile.open(QIODevice::WriteOnly | QIODevice::Text)) { /*...*/
-    return false;
+    return "false";
   }
   QTextStream outDecoded(&decodedFile);
   outDecoded << decodedMessage;
   decodedFile.close();
 
-  if (errorLog.isEmpty()) {
-    qInfo() << "No errors detected.\n";
-  } else {
-    qInfo() << errorLog;
-  }
+  if (errorLog.isEmpty()) errorLog.append("No errors detected.");
+  qInfo() << errorLog;
   qInfo() << "Parity decoding successful.";
-  return true;
+  return errorLog;
 }
