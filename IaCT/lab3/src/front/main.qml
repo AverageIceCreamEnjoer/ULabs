@@ -3,18 +3,21 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import QtQuick.Controls.Material
+import QtQuick.Window
+//import QtQuick.Controls.Material
 
 // Импортируем наш C++ класс
 import com.mycompany.coding 1.0
 
 // Создаем главный объект - окно
-Window {
+ApplicationWindow {
     id: root
-    width: 600
-    height: 400
+    //width: 600
+    //height: 400
+    minimumWidth: rootLayout.implicitWidth
+    minimumHeight: rootLayout.implicitHeight
     visible: true
-    Material.theme: Material.Light
+    //Material.theme: Material.Light
     title: "Кодирование алгоритмом Гильберта-Мура"
 
     // Создаем экземпляр нашего C++ объекта.
@@ -28,9 +31,14 @@ Window {
         id: openDialog
         title: "Выберите файл для кодирования"
         onAccepted: {
-            // Эта функция будет вызвана, когда мы выберем файл
-            // Мы передадим путь в текстовое поле, которое его вызвало
-            openDialog.sourceTextField.text = selectedFile;
+            if (selectedFile) {
+                // Преобразуем строку URL в локальный путь
+                var pathString = selectedFile.toString();
+                if (pathString.startsWith("file://")) {
+                    pathString = pathString.substring(7); // Удаляем "file://"
+                }
+                openDialog.sourceTextField.text = pathString;
+            }
         }
         // Пользовательское свойство, чтобы диалог "знал", какое поле обновлять
         property TextField sourceTextField
@@ -41,13 +49,21 @@ Window {
         title: "Выберите файл для сохранения"
         fileMode: FileDialog.SaveFile // Позволяет вводить новое имя файла
         onAccepted: {
-            saveDialog.sourceTextField.text = selectedFile;
+            if (selectedFile) {
+                // Преобразуем строку URL в локальный путь
+                var pathString = selectedFile.toString();
+                if (pathString.startsWith("file://")) {
+                    pathString = pathString.substring(7); // Удаляем "file://"
+                }
+                saveDialog.sourceTextField.text = pathString;
+            }
         }
         property TextField sourceTextField
     }
 
     // Главный контейнер
     ColumnLayout {
+        id: rootLayout
         anchors.fill: parent
         anchors.margins: 10
 

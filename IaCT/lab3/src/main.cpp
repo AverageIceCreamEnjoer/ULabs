@@ -1,9 +1,12 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 
 #include "back/GilbertMooreCoder.hpp"
 
 int main(int argc, char *argv[]) {
+  // Другие варианты: "Material", "Universal", "Imagine"
+  QQuickStyle::setStyle("Universal");
   // Создаем экземпляр приложения
   QGuiApplication app(argc, argv);
 
@@ -14,7 +17,7 @@ int main(int argc, char *argv[]) {
 
   // Создаем движок QML
   QQmlApplicationEngine engine;
-
+  engine.addImportPath("/usr/lib/x86_64-linux-gnu/qt6/qml");
   // Указываем движку загрузить наш QML файл.
   // Путь "qrc:/" означает, что файл находится внутри ресурсов, скомпилированных
   // в программу.
