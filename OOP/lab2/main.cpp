@@ -113,7 +113,6 @@ void testVariantTable() {
 }
 
 int main() {
-  nstu::randNum(5);
   testVariantTable();
   testDistribution_3_1_1();
   testDistribution_3_1_2();

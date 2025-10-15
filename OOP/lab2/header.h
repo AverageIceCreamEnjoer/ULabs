@@ -7,12 +7,7 @@ using ld = long double;
 
 namespace nstu {
 
-inline ld randNum(uint32_t seed = 0) {
-  static bool initialized = false;
-  if (!initialized) {
-    srand(seed);
-    initialized = true;
-  }
+inline ld randNum() {
   ld r;
   do {
     r = static_cast<ld>(rand()) / RAND_MAX;
@@ -22,7 +17,7 @@ inline ld randNum(uint32_t seed = 0) {
 
 class vector {
  private:
-  std::unique_ptr<ld> data;
+  std::unique_ptr<ld[]> data;
   uint32_t length;
   uint32_t full_length;
   // ========== Vector Iterator =========
@@ -125,27 +120,27 @@ class vector {
   using const_iterator = ConstVectorIterator;
 
   explicit vector() : length(0), full_length(1) {
-    data = std::unique_ptr<ld>(new ld[full_length]);
+    data = std::unique_ptr<ld[]>(new ld[full_length]);
     if (!data) throw std::bad_alloc();
   }
 
   explicit vector(uint32_t length, ld value = 0) : full_length(length * 2) {
     this->length = length;
-    data = std::unique_ptr<ld>(new ld[full_length]);
+    data = std::unique_ptr<ld[]>(new ld[full_length]);
     if (!data) throw std::bad_alloc();
     if (value != 0) std::fill(data.get(), data.get() + length, value);
   }
 
   vector(std::initializer_list<ld> list)
       : length(list.size()), full_length(list.size() * 2) {
-    data = std::unique_ptr<ld>(new ld[full_length]);
+    data = std::unique_ptr<ld[]>(new ld[full_length]);
     if (!data) throw std::bad_alloc();
     std::copy(list.begin(), list.end(), data.get());
   }
 
   vector(const vector& other)
       : length(other.length), full_length(other.full_length) {
-    data = std::unique_ptr<ld>(new ld[full_length]);
+    data = std::unique_ptr<ld[]>(new ld[full_length]);
     if (!data) throw std::bad_alloc();
     std::copy(other.data.get(), other.data.get() + other.length, data.get());
   }
@@ -154,7 +149,7 @@ class vector {
     if (this != &other) {
       length = other.length;
       full_length = other.full_length;
-      data = std::unique_ptr<ld>(new ld[full_length]);
+      data = std::unique_ptr<ld[]>(new ld[full_length]);
       if (!data) throw std::bad_alloc();
       std::copy(other.data.get(), other.data.get() + other.length, data.get());
     }
@@ -197,7 +192,7 @@ class vector {
   void push_back(ld value) {
     if (length >= full_length) {
       full_length *= 2;
-      std::unique_ptr<ld> new_data(new ld[full_length]);
+      std::unique_ptr<ld[]> new_data(new ld[full_length]);
       if (!new_data) throw std::bad_alloc();
       std::copy(data.get(), data.get() + length, new_data.get());
       data = std::move(new_data);
