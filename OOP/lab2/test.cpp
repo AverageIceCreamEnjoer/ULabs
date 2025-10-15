@@ -215,7 +215,20 @@ void testAllMainDistMethods() {
     std::cout << "   - Успех: перехвачено исключение для lambda=0 в файле: "
               << e.what() << std::endl;
   }
+  // 6.5. Установка lambda = 0 через сеттер
+  MainDist dist_exc(1, 1, 1);
+  try {
+    dist_exc.setLambda(0);
+  } catch (const std::invalid_argument& e) {
+    std::cout << "   - Успех (setLambda(0)): " << e.what() << std::endl;
+  }
 
+  // 6.6. Установка nu = 0 через сеттер
+  try {
+    dist_exc.setNu(0);
+  } catch (const std::invalid_argument& e) {
+    std::cout << "   - Успех (setNu(0)): " << e.what() << std::endl;
+  }
   std::cout << "\n--- ПОЛНОЕ ТЕСТИРОВАНИЕ ЗАВЕРШЕНО ---\n";
 }
 

@@ -7,6 +7,7 @@
 MainDist::MainDist(ld nu, ld mu, ld lambda)
     : m_nu(nu), m_mu(mu), m_lambda(lambda) {
   if (lambda == 0) throw std::invalid_argument("Лямбда не может быть 0");
+  if (nu == 0) throw std::invalid_argument("Нулевое значение nu");
 }
 
 MainDist::MainDist(std::string file_name) {
@@ -14,6 +15,7 @@ MainDist::MainDist(std::string file_name) {
   if (!file.is_open()) throw std::invalid_argument("Не удалось открыть файл");
   file >> m_nu >> m_mu >> m_lambda;
   if (m_lambda == 0) throw std::invalid_argument("Лямбда не может быть 0");
+  if (m_nu == 0) throw std::invalid_argument("Нулевое значение nu");
   file.close();
 }
 
@@ -32,6 +34,7 @@ MainDist::MainDist(std::initializer_list<ld> list) {
   m_mu = *(i++);
   m_lambda = *i;
   if (m_lambda == 0) throw std::invalid_argument("Лямбда не может быть 0");
+  if (m_nu == 0) throw std::invalid_argument("Нулевое значение nu");
 }
 
 MainDist::MainDist(const MainDist& other)
@@ -69,9 +72,19 @@ ld MainDist::getNu() const noexcept { return m_nu; }
 ld MainDist::getMu() const noexcept { return m_mu; }
 ld MainDist::getLambda() const noexcept { return m_lambda; }
 
-void MainDist::setNu(ld nu) noexcept { m_nu = nu; }
+void MainDist::setNu(ld nu) {
+  if (nu == 0)
+    throw std::invalid_argument("Нулевое значение nu");
+  else
+    m_nu = nu;
+}
 void MainDist::setMu(ld mu) noexcept { m_mu = mu; }
-void MainDist::setLambda(ld lambda) noexcept { m_lambda = lambda; }
+void MainDist::setLambda(ld lambda) {
+  if (lambda == 0)
+    throw std::invalid_argument("Лямбда не может быть 0");
+  else
+    m_lambda = lambda;
+}
 
 ld MainDist::density(ld x) const noexcept {
   ld coeff = 2 * m_lambda * sqrt(m_nu) * boost::math::cyl_bessel_k(1, m_nu);

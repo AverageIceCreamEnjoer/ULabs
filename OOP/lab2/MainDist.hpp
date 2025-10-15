@@ -25,9 +25,9 @@ class MainDist {
   ld getMu() const noexcept;
   ld getLambda() const noexcept;
 
-  void setNu(ld nu) noexcept;
+  void setNu(ld nu);
   void setMu(ld mu) noexcept;
-  void setLambda(ld lambda) noexcept;
+  void setLambda(ld lambda);
 
   ld density(ld x) const noexcept;
   nstu::vector density(const nstu::vector& x) const;
