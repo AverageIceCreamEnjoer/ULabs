@@ -14,6 +14,7 @@ class MainDist {
  public:
   explicit MainDist(ld nu, ld mu, ld lambda);
   explicit MainDist(std::string file_name);
+  void save(const std::string& file_name) const;
   explicit MainDist(std::initializer_list<ld> list);
   MainDist(const MainDist& other);
   MainDist& operator=(const MainDist& other);

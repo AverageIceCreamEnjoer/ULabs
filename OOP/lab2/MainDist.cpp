@@ -17,6 +17,13 @@ MainDist::MainDist(std::string file_name) {
   file.close();
 }
 
+void MainDist::save(const std::string& file_name) const {
+  std::ofstream file(file_name);
+  if (!file.is_open()) throw std::runtime_error("Не удалось открыть файл");
+  file << m_nu << " " << m_mu << " " << m_lambda;
+  file.close();
+}
+
 MainDist::MainDist(std::initializer_list<ld> list) {
   if (list.size() != 3)
     throw std::invalid_argument("Неверное количество аргументов");

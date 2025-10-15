@@ -44,10 +44,10 @@ void testAllMainDistMethods() {
 
   // 1.2. Конструктор из файла
   std::cout << "\n1.2. Конструктор из файла (test_params.txt)\n";
-  std::ofstream test_file("test_params.txt");
-  test_file << "5.0 1.0 2.0";
-  test_file.close();
+  MainDist dist_file_params(5.0, 1.0, 2.0);
+  dist_file_params.save("test_params.txt");
   MainDist dist_file("test_params.txt");
+  printDistState(dist_file_params, "dist_file_params");
   printDistState(dist_file, "dist_file");
 
   // 1.3. Конструктор с initializer_list
