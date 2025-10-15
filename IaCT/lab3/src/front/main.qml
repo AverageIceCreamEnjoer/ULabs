@@ -209,8 +209,89 @@ ApplicationWindow {
                 text: "Декодирование с проверкой на четность"
                 onClicked: {
                     var errorLog = coder.decodeParity(parityInputPath.text, parityOutputPath.text);
-                    parityErrorArea.text = errorLog;
+                    parityErrorArea.text = errorLog != "false" ? errorLog : "";
                     statusLabel.text = errorLog != "false" ? "Декодирование с проверкой на четность прошло успешно!" : "Декодирование с проверкой на четность завершилось с ошибкой.";
+                    statusLabel.color = errorLog != "false" ? "green" : "red";
+                }
+            }
+        }
+
+        GroupBox {
+            title: "Код хэмминга (9, 5)"
+            Layout.fillWidth: true
+            Layout.topMargin: 15 // Небольшой отступ сверху
+
+            GridLayout {
+                columns: 3
+                width: parent.width
+
+                // Поля для кодирования
+                Label {
+                    text: "Входной файл:"
+                }
+                TextField {
+                    id: hammingInputPath
+                    Layout.fillWidth: true
+                    placeholderText: "Выбрать входной файл для чтения..."
+                }
+                Button {
+                    text: "Выбрать..."
+                    onClicked: {
+                        openDialog.sourceTextField = hammingInputPath;
+                        openDialog.open();
+                    }
+                }
+
+                Label {
+                    text: "Выходной файл:"
+                }
+                TextField {
+                    id: hammingOutputPath
+                    Layout.fillWidth: true
+                    placeholderText: "Выбрать куда сохранить выходной файл..."
+                }
+                Button {
+                    text: "Выбрать..."
+                    onClicked: {
+                        saveDialog.sourceTextField = hammingOutputPath;
+                        saveDialog.open();
+                    }
+                }
+                Label {
+                    text: "Лог ошибок:"
+                    font.bold: true
+                    Layout.topMargin: 10
+                }
+                TextArea {
+                    id: hammingErrorArea
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 80
+                    readOnly: true
+                    placeholderText: "Здесь будут отображаться ошибки декодирования..."
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 10
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
+
+            Button {
+                text: "Кодирование с проверкой"
+                onClicked: {
+                    var success = coder.encodeHamming(hammingInputPath.text, hammingOutputPath.text);
+                    statusLabel.text = success ? "Кодирование с проверкой прошло успепшно!" : "Кодирование с проверкой завершилось с ошибкой.";
+                    statusLabel.color = success ? "green" : "red";
+                }
+            }
+            Button {
+                text: "Декодирование с проверкой"
+                onClicked: {
+                    var errorLog = coder.decodeHamming(hammingInputPath.text, hammingOutputPath.text);
+                    hammingErrorArea.text = errorLog != "false" ? errorLog : "";
+                    statusLabel.text = errorLog != "false" ? "Декодирование с проверкой прошло успешно!" : "Декодирование с проверкой завершилось с ошибкой.";
                     statusLabel.color = errorLog != "false" ? "green" : "red";
                 }
             }

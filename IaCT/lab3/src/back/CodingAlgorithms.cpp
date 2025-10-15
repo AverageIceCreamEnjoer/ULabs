@@ -301,6 +301,7 @@ QString CodingAlgorithms::decodeParity(const QString &inputFilePath,
 }
 
 CodingAlgorithms::Hamming::Hamming() {
+  m_H95 = m_H95.Transpose();
   qInfo() << "--- Hamming (9,5) ---";
   int alphabetSize = pow(2, m_bitSymbolSize);
   qInfo() << "Alphabet size:" << alphabetSize;
@@ -338,6 +339,7 @@ bool CodingAlgorithms::Hamming::encode(const QString &inputFilePath,
   auto symbols = message.split(" ");
   QString binaryCode = "";
   for (int i = 0; i < symbols.size(); i++) {
+    if (i != 0) binaryCode.append(" ");
     binaryCode.append(m_encodedAlphabet[m_charToIndex[symbols[i]]]);
   }
   result = saveFile(outputFilePath, binaryCode, symbols.length());
@@ -365,8 +367,9 @@ QString CodingAlgorithms::Hamming::decode(const QString &inputFilePath,
   qInfo() << "Сообщение для декодирования:" << encodedMessage;
   QString decodedMessage = "";
   QString errorLog = "";
-  for (int i = 0; i < messageLength; i++) {
-    QString block = encodedMessage.mid(i * m_bitSymbolSize, m_bitSymbolSize);
+  auto blocks = encodedMessage.split(" ");
+  int i = 0;
+  for (auto &block : blocks) {
     // Проверка
     auto res = mul(block, m_H95);
     bool isError = false;
@@ -391,7 +394,9 @@ QString CodingAlgorithms::Hamming::decode(const QString &inputFilePath,
       }
     }
     int index = m_encodedCharToIndex[block];
+    if (i != 0) decodedMessage.append(" ");
     decodedMessage.append(m_alphabet[index]);
+    i++;
   }
   result = saveFile(outputFilePath, decodedMessage);
   if (!result) {
