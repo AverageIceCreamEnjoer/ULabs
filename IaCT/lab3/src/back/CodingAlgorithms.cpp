@@ -5,7 +5,7 @@
 #include <QTextStream>
 #include <QUrl>
 
-CodingAlgorithms::CodingAlgorithms(QObject *parent)
+CodingAlgorithms::CodingAlgorithms(QObject* parent)
     : QObject(parent), m_gilbertMoore(), m_hamming() {}
 
 CodingAlgorithms::GilbertMoore::GilbertMoore()
@@ -33,12 +33,12 @@ CodingAlgorithms::GilbertMoore::GilbertMoore()
   }
 }
 
-QString CodingAlgorithms::GilbertMoore::stringToBits(const QString &text) {
+QString CodingAlgorithms::GilbertMoore::stringToBits(const QString& text) {
   QString bits = "";
   for (int i = 0; i < text.length(); i += 2) {
     QString ch = text.mid(i, 2);
     if (!m_charToIndex.contains(ch)) {
-      qWarning() << "символ не из алфавита:" << ch;
+      qWarning() << "Ошибка: символ не из алфавита:" << ch;
       return "";
     }
     bits.append(m_encodedAlphabet[m_charToIndex[ch]]);
@@ -46,30 +46,31 @@ QString CodingAlgorithms::GilbertMoore::stringToBits(const QString &text) {
   return bits;
 }
 
-QString CodingAlgorithms::GilbertMoore::bitsToString(const QString &bits) {
+QString CodingAlgorithms::GilbertMoore::bitsToString(const QString& bits) {
   QString text = "";
   if (bits.length() % m_bitSymbolSize != 0) {
-    qWarning() << "Неверная длина последовательности бит. Должна делиться на "
-                  "m_bitSymbolSize ="
-               << m_bitSymbolSize;
+    qWarning()
+        << "Ошибка: неверная длина последовательности бит. Должна делиться на "
+           "m_bitSymbolSize ="
+        << m_bitSymbolSize;
     return "";
   }
   for (int i = 0; i < bits.length(); i += m_bitSymbolSize) {
     QString ch = bits.mid(i, m_bitSymbolSize);
     if (!m_encodedCharToIndex.contains(ch)) {
-      qWarning()
-          << "Не получилось конвертировать последовательность бит в символ:"
-          << ch;
+      qWarning() << "Ошибка: не получилось конвертировать последовательность "
+                    "бит в символ:"
+                 << ch;
     } else
       text.append(m_alphabet[m_encodedCharToIndex[ch]]);
   }
   return text;
 }
 
-QString CodingAlgorithms::GilbertMoore::XOR(const QString &a,
-                                            const QString &b) {
+QString CodingAlgorithms::GilbertMoore::XOR(const QString& a,
+                                            const QString& b) {
   if (a.length() != b.length()) {
-    qWarning() << "Длины строк для XOR не совпадают:" << a.length()
+    qWarning() << "Ошибка: длины строк для XOR не совпадают:" << a.length()
                << "!=" << b.length();
     return "";
   }
@@ -97,11 +98,11 @@ QString CodingAlgorithms::GilbertMoore::doubleToBinaryString(double value,
 }
 
 double CodingAlgorithms::GilbertMoore::binaryStringToDouble(
-    const QString &bits) {
+    const QString& bits) {
   double value = 0.0;
   double powerOfTwo = 0.5;
 
-  for (const QChar &bit : bits) {
+  for (const QChar& bit : bits) {
     if (bit == '1') {
       value += powerOfTwo;
     }
@@ -110,11 +111,12 @@ double CodingAlgorithms::GilbertMoore::binaryStringToDouble(
   return value;
 }
 
-bool CodingAlgorithms::openFile(const QString &inputFilePath, QString &message,
-                                int *messageLength) {
+bool CodingAlgorithms::openFile(const QString& inputFilePath, QString& message,
+                                int* messageLength) {
   QFile inputFile(inputFilePath);
   if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    qWarning() << "Невозможно открыть файл для чтения:" << inputFilePath;
+    qWarning() << "Ошибка: невозможно открыть файл для чтения:"
+               << inputFilePath;
     return false;
   }
   QTextStream in(&inputFile);
@@ -126,17 +128,18 @@ bool CodingAlgorithms::openFile(const QString &inputFilePath, QString &message,
   }
   inputFile.close();
   if (message.isEmpty()) {
-    qWarning() << "Входной файл пустой.";
+    qWarning() << "Ошибка: входной файл пустой.";
     return false;
   }
   return true;
 }
 
-bool CodingAlgorithms::saveFile(const QString &outputFilePath,
-                                const QString &message, int messageLength) {
+bool CodingAlgorithms::saveFile(const QString& outputFilePath,
+                                const QString& message, int messageLength) {
   QFile outputFile(outputFilePath);
   if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    qWarning() << "Невозможно открыть файл для записи:" << outputFilePath;
+    qWarning() << "Ошибка: невозможно открыть файл для записи:"
+               << outputFilePath;
     return false;
   }
   QTextStream out(&outputFile);
@@ -146,8 +149,8 @@ bool CodingAlgorithms::saveFile(const QString &outputFilePath,
   return true;
 }
 
-bool CodingAlgorithms::GilbertMoore::encode(const QString &inputFilePath,
-                                            const QString &outputFilePath) {
+bool CodingAlgorithms::GilbertMoore::encode(const QString& inputFilePath,
+                                            const QString& outputFilePath) {
   QString message;
   bool result = openFile(inputFilePath, message);
   if (!result) {
@@ -164,18 +167,18 @@ bool CodingAlgorithms::GilbertMoore::encode(const QString &inputFilePath,
             << outputFilePath;
     return true;
   } else {
-    qWarning() << "Невозможно закодировать сообщение:" << message;
+    qWarning() << "Ошибка: невозможно закодировать сообщение:" << message;
     return false;
   }
 }
 
-bool CodingAlgorithms::encodeGilbertMoore(const QString &inputFilePath,
-                                          const QString &outputFilePath) {
+bool CodingAlgorithms::encodeGilbertMoore(const QString& inputFilePath,
+                                          const QString& outputFilePath) {
   return m_gilbertMoore.encode(inputFilePath, outputFilePath);
 }
 
-bool CodingAlgorithms::GilbertMoore::decode(const QString &inputFilePath,
-                                            const QString &outputFilePath) {
+bool CodingAlgorithms::GilbertMoore::decode(const QString& inputFilePath,
+                                            const QString& outputFilePath) {
   int messageLength;
   QString binaryCode;
   bool result = openFile(inputFilePath, binaryCode, &messageLength);
@@ -198,13 +201,13 @@ bool CodingAlgorithms::GilbertMoore::decode(const QString &inputFilePath,
   }
 }
 
-bool CodingAlgorithms::decodeGilbertMoore(const QString &inputFilePath,
-                                          const QString &outputFilePath) {
+bool CodingAlgorithms::decodeGilbertMoore(const QString& inputFilePath,
+                                          const QString& outputFilePath) {
   return m_gilbertMoore.decode(inputFilePath, outputFilePath);
 }
 
 bool CodingAlgorithms::GilbertMoore::encodeParity(
-    const QString &inputFilePath, const QString &outputFilePath) {
+    const QString& inputFilePath, const QString& outputFilePath) {
   QString message;
   bool result = openFile(inputFilePath, message);
   if (!result) {
@@ -227,7 +230,7 @@ bool CodingAlgorithms::GilbertMoore::encodeParity(
     }
   } else {
     // Правило для нечетной длины: блоки по 3 бита
-    qWarning() << "Ошибка: Допускается кодирование блоками по"
+    qWarning() << "Ошибка: допускается кодирование блоками по"
                << m_bitSymbolSize << "бита (четной длины).";
   }
 
@@ -240,13 +243,13 @@ bool CodingAlgorithms::GilbertMoore::encodeParity(
   return true;
 }
 
-bool CodingAlgorithms::encodeParity(const QString &inputFilePath,
-                                    const QString &outputFilePath) {
+bool CodingAlgorithms::encodeParity(const QString& inputFilePath,
+                                    const QString& outputFilePath) {
   return m_gilbertMoore.encodeParity(inputFilePath, outputFilePath);
 }
 
 QString CodingAlgorithms::GilbertMoore::decodeParity(
-    const QString &inputFilePath, const QString &outputFilePath) {
+    const QString& inputFilePath, const QString& outputFilePath) {
   QString encodedBits;
   int messageLength;
   bool result = openFile(inputFilePath, encodedBits, &messageLength);
@@ -271,7 +274,7 @@ QString CodingAlgorithms::GilbertMoore::decodeParity(
       decodedBits.append(b2);
     }
   } else {
-    qWarning() << "Ошибка: Допускается кодирование блоками по"
+    qWarning() << "Ошибка: допускается кодирование блоками по"
                << m_bitSymbolSize << "бита (четной длины).";
     return "false";
   }
@@ -295,8 +298,8 @@ QString CodingAlgorithms::GilbertMoore::decodeParity(
   return errorLog;
 }
 
-QString CodingAlgorithms::decodeParity(const QString &inputFilePath,
-                                       const QString &outputFilePath) {
+QString CodingAlgorithms::decodeParity(const QString& inputFilePath,
+                                       const QString& outputFilePath) {
   return m_gilbertMoore.decodeParity(inputFilePath, outputFilePath);
 }
 
@@ -315,8 +318,8 @@ CodingAlgorithms::Hamming::Hamming() {
   }
 }
 
-QString CodingAlgorithms::Hamming::mul(const QString &symbol,
-                                       const Matrix<int> &M) {
+QString CodingAlgorithms::Hamming::mul(const QString& symbol,
+                                       const Matrix<int>& M) {
   QString result;
   for (int j = 0; j < M.GetCols(); ++j) {
     int sum = 0;
@@ -328,21 +331,34 @@ QString CodingAlgorithms::Hamming::mul(const QString &symbol,
   return result;
 }
 
-bool CodingAlgorithms::Hamming::encode(const QString &inputFilePath,
-                                       const QString &outputFilePath) {
+bool CodingAlgorithms::Hamming::encode(const QString& inputFilePath,
+                                       const QString& outputFilePath) {
   QString message;
   bool result = openFile(inputFilePath, message, nullptr);
   if (!result) {
     return false;
   }
   qInfo() << "Сообщение для кодирования:" << message;
-  auto symbols = message.split(" ");
+  QStringList symbols;
+  QString tmp = "";
+  for (int i = 0; i < message.length(); i++) {
+    tmp.append(message[i]);
+    if (tmp.length() == m_bitSymbolSize) {
+      symbols.append("");
+      symbols.back() = tmp;
+      tmp = "";
+    }
+  }
+  if (!tmp.isEmpty()) {
+    qWarning() << "Ошибка: длина сообщения не делится на размер слова:"
+               << m_bitSymbolSize;
+    return false;
+  }
   QString binaryCode = "";
   for (int i = 0; i < symbols.size(); i++) {
-    if (i != 0) binaryCode.append(" ");
     binaryCode.append(m_encodedAlphabet[m_charToIndex[symbols[i]]]);
   }
-  result = saveFile(outputFilePath, binaryCode, symbols.length());
+  result = saveFile(outputFilePath, binaryCode);
   if (!result) {
     return false;
   }
@@ -351,13 +367,13 @@ bool CodingAlgorithms::Hamming::encode(const QString &inputFilePath,
   return true;
 }
 
-bool CodingAlgorithms::encodeHamming(const QString &inputFilePath,
-                                     const QString &outputFilePath) {
+bool CodingAlgorithms::encodeHamming(const QString& inputFilePath,
+                                     const QString& outputFilePath) {
   return m_hamming.encode(inputFilePath, outputFilePath);
 }
 
-QString CodingAlgorithms::Hamming::decode(const QString &inputFilePath,
-                                          const QString &outputFilePath) {
+QString CodingAlgorithms::Hamming::decode(const QString& inputFilePath,
+                                          const QString& outputFilePath) {
   QString encodedMessage;
   int messageLength;
   bool result = openFile(inputFilePath, encodedMessage, &messageLength);
@@ -367,9 +383,23 @@ QString CodingAlgorithms::Hamming::decode(const QString &inputFilePath,
   qInfo() << "Сообщение для декодирования:" << encodedMessage;
   QString decodedMessage = "";
   QString errorLog = "";
-  auto blocks = encodedMessage.split(" ");
+  QStringList blocks;
+  QString tmp = "";
+  for (int i = 0; i < encodedMessage.length(); ++i) {
+    tmp.append(encodedMessage[i]);
+    if (tmp.length() == 9) {
+      blocks.append("");
+      blocks.back() = tmp;
+      tmp = "";
+    }
+  }
+  if (!tmp.isEmpty()) {
+    qWarning() << "Ошибка: длина закодированного сообщения не делится на "
+                  "размер слова (9)";
+    return "false";
+  }
   int i = 0;
-  for (auto &block : blocks) {
+  for (auto& block : blocks) {
     // Проверка
     auto res = mul(block, m_H95);
     bool isError = false;
@@ -394,7 +424,6 @@ QString CodingAlgorithms::Hamming::decode(const QString &inputFilePath,
       }
     }
     int index = m_encodedCharToIndex[block];
-    if (i != 0) decodedMessage.append(" ");
     decodedMessage.append(m_alphabet[index]);
     i++;
   }
@@ -407,7 +436,7 @@ QString CodingAlgorithms::Hamming::decode(const QString &inputFilePath,
   return errorLog;
 }
 
-QString CodingAlgorithms::decodeHamming(const QString &inputFilePath,
-                                        const QString &outputFilePath) {
+QString CodingAlgorithms::decodeHamming(const QString& inputFilePath,
+                                        const QString& outputFilePath) {
   return m_hamming.decode(inputFilePath, outputFilePath);
 }
