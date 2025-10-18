@@ -440,3 +440,72 @@ QString CodingAlgorithms::decodeHamming(const QString& inputFilePath,
                                         const QString& outputFilePath) {
   return m_hamming.decode(inputFilePath, outputFilePath);
 }
+
+QString CodingAlgorithms::humanToHamming(const QString& outputFilePath,
+                                         const QString& message) {
+  bool error = false;
+  auto symbols = message.trimmed().split(" ");
+  QString result = "";
+  for (auto& symbol : symbols) {
+    bool ok;
+    int sym = symbol.toInt(&ok);
+    if (ok && sym < 32 && sym >= 0)
+      result.append(m_hamming.m_alphabet[sym]);
+    else {
+      result = "Ошибка: символа " + symbol + " нет в алфавите";
+      error = true;
+      break;
+    }
+  }
+  if (!error) {
+    error = !saveFile(outputFilePath, result);
+    return (error) ? "Ошибка: не удалось открыть файл для записи" : result;
+  }
+  return result;
+}
+
+QVariantMap CodingAlgorithms::hammingToHuman(const QString& inputFilePath) {
+  QVariantMap result;
+  QString file;
+  QString message;
+  bool error = !openFile(inputFilePath, file);
+  if (error) {
+    file = "Ошибка: не удалось открыть файл для чтения";
+    message = "";
+  } else {
+    QStringList symbols;
+    QString tmp = "";
+    for (int i = 0; i < file.length(); ++i) {
+      tmp.append(file[i]);
+      if (tmp.length() == 5) {
+        symbols.append("");
+        symbols.back() = tmp;
+        tmp = "";
+      }
+    }
+    if (!tmp.isEmpty()) {
+      qWarning()
+          << "Ошибка: не удалось декодировать сообщение кода Хэмминга в числа";
+      qWarning() << "Причина: сообщение не делится на длину кодового слова (5)";
+      message = "";
+    } else {
+      message = "";
+      for (const auto& symbol : symbols) {
+        if (m_hamming.m_charToIndex.contains(symbol)) {
+          message.append(QString::number(m_hamming.m_charToIndex[symbol]) +
+                         " ");
+        } else {
+          qWarning()
+              << "Ошибка: не удалось декодировать сообщение кода Хэмминга "
+                 "в числа";
+          qWarning() << "Ошибка: символа " + symbol + " нет в алфавите";
+          message = "";
+          break;
+        }
+      }
+    }
+  }
+  result["file"] = file;
+  result["message"] = message.trimmed();
+  return result;
+}
