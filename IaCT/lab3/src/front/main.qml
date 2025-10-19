@@ -391,6 +391,30 @@ ApplicationWindow {
                     }
                 }
             }
+            RowLayout {
+                        Layout.fillWidth: true
+                        Label {
+                            text: "Входной файл:"
+                        }
+                        TextField {
+                            id: interferenceFile
+                            Layout.fillWidth: true
+                            placeholderText: "Выбрать куда сохранить файл с сообщением..."
+                        }
+                        Button {
+                            text: "Выбрать..."
+                            onClicked: {
+                                saveDialog.sourceTextField = interferenceFile;
+                                saveDialog.open();
+                            }
+                        }
+                    }
+                    Button {
+                        Layout.fillWidth: true
+                        onClicked: {
+                            coder.interference(interferenceFile.text)
+                        }
+                    }
         }
     }
 }

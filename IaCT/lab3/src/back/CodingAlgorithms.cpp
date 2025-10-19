@@ -402,29 +402,43 @@ QString CodingAlgorithms::Hamming::decode(const QString& inputFilePath,
   for (auto& block : blocks) {
     // Проверка
     auto res = mul(block, m_H95);
-    bool isError = false;
-    for (int j = 0; j < res.length(); j++) {
-      if (res[j] == '1') {
-        errorLog.append(
-            QString("Обнаружена ошибка в блоке %1, бите %2.\n").arg(i).arg(j));
-        isError = true;
-      }
-    }
-    // Исправление (только 1 ошибки!)
+    bool isError = res.contains('1');
     if (isError) {
-      int syndrom = res.toUInt(nullptr, 2);
-      block[syndrom - 1] = (block[syndrom - 1] == '1') ? '0' : '1';
-      // снова проверка
-      auto res2 = mul(block, m_H95);
-      if (res2.contains('1')) {
+      errorLog.append(QString("Обнаружена ошибка в блоке %1. Синдром: %2.\n")
+                          .arg(i)
+                          .arg(res));
+      // Поиск позиции ошибки
+      int errorPos = -1;
+      for (int j = 0; j < m_H95.GetRows(); ++j) {
+        QString row;
+        for (int k = 0; k < m_H95.GetCols(); ++k)
+          row.append(QString::number(m_H95(j, k)));
+        if (row == res) {
+          errorPos = j;
+          break;
+        }
+      }
+      if (errorPos == -1) {
         errorLog.append(
             QString("Ошибку в блоке %1 не получилось исправить.\n").arg(i));
+        decodedMessage.append("~~~~~");
       } else {
-        errorLog.append(QString("Ошибка в блоке %1 исправлена.\n").arg(i));
+        block[errorPos] = (block[errorPos] == '1') ? '0' : '1';
+        // снова проверка
+        auto res2 = mul(block, m_H95);
+        if (res2.contains('1')) {
+          errorLog.append(
+              QString("Ошибку в блоке %1 не получилось исправить.\n").arg(i));
+          decodedMessage.append("~~~~~");
+        } else {
+          errorLog.append(QString("Ошибка в блоке %1 исправлена.\n").arg(i));
+          decodedMessage.append(m_alphabet[m_encodedCharToIndex[block]]);
+        }
       }
+    } else {
+      int index = m_encodedCharToIndex[block];
+      decodedMessage.append(m_alphabet[index]);
     }
-    int index = m_encodedCharToIndex[block];
-    decodedMessage.append(m_alphabet[index]);
     i++;
   }
   result = saveFile(outputFilePath, decodedMessage);
@@ -451,7 +465,9 @@ QString CodingAlgorithms::humanToHamming(const QString& outputFilePath,
     int sym = symbol.toInt(&ok);
     if (ok && sym < 32 && sym >= 0)
       result.append(m_hamming.m_alphabet[sym]);
-    else {
+    else if (symbol == "~") {
+      result.append("~~~~~");
+    } else {
       result = "Ошибка: символа " + symbol + " нет в алфавите";
       error = true;
       break;
@@ -494,6 +510,8 @@ QVariantMap CodingAlgorithms::hammingToHuman(const QString& inputFilePath) {
         if (m_hamming.m_charToIndex.contains(symbol)) {
           message.append(QString::number(m_hamming.m_charToIndex[symbol]) +
                          " ");
+        } else if (symbol == "~~~~~") {
+          message.append("~ ");
         } else {
           qWarning()
               << "Ошибка: не удалось декодировать сообщение кода Хэмминга "
@@ -507,5 +525,23 @@ QVariantMap CodingAlgorithms::hammingToHuman(const QString& inputFilePath) {
   }
   result["file"] = file;
   result["message"] = message.trimmed();
+  return result;
+}
+
+bool CodingAlgorithms::interference(const QString& inputFilePath) {
+  QString message;
+  bool result = openFile(inputFilePath, message);
+  double interference = 0.4;
+  if (result) {
+    bool changed = false;
+    for (int i = 0; i < message.length(); ++i) {
+      if (!changed && static_cast<double>(rand()) / RAND_MAX < interference) {
+        message[i] = (message[i] == '0') ? '1' : '0';
+        changed = true;
+      }
+      if (i % 9 == 0) changed = false;
+    }
+    result = saveFile(inputFilePath, message);
+  }
   return result;
 }
