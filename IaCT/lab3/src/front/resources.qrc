@@ -1,5 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource prefix="/front">
     <file>main.qml</file>
+    <file>MyComponents/qmldir</file>
+    <file>MyComponents/fileInput.qml</file>
 </qresource>
 </RCC>

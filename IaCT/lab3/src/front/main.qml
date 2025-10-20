@@ -4,7 +4,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtQuick.Window
-//import QtQuick.Controls.Material
+
+import MyComponents 1.0
 
 // Импортируем наш C++ класс
 import com.mycompany.coding 1.0
@@ -12,10 +13,10 @@ import com.mycompany.coding 1.0
 // Создаем главный объект - окно
 ApplicationWindow {
     id: root
-    //width: 600
-    //height: 400
+    //width: 800
+    height: 600
     minimumWidth: rootLayout.implicitWidth * 2
-    minimumHeight: rootLayout.implicitHeight
+    //minimumHeight: rootLayout.implicitHeight
     visible: true
     //Material.theme: Material.Light
     title: "Кодирование алгоритмом Гильберта-Мура"
@@ -37,11 +38,11 @@ ApplicationWindow {
                 if (pathString.startsWith("file://")) {
                     pathString = pathString.substring(7); // Удаляем "file://"
                 }
-                openDialog.sourceTextField.text = pathString;
+                openDialog.sourceFileInput.filePath = pathString;
             }
         }
         // Пользовательское свойство, чтобы диалог "знал", какое поле обновлять
-        property TextField sourceTextField
+        property FileInput sourceFileInput
     }
 
     FileDialog {
@@ -55,262 +56,233 @@ ApplicationWindow {
                 if (pathString.startsWith("file://")) {
                     pathString = pathString.substring(7); // Удаляем "file://"
                 }
-                saveDialog.sourceTextField.text = pathString;
+                saveDialog.sourceFileInput.filePath = pathString;
             }
         }
-        property TextField sourceTextField
+        property FileInput sourceFileInput
     }
+
     RowLayout {
-        Layout.alignment: Qt.AlignHCenter
         anchors.fill: parent
+        ScrollView {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
+            padding: 10
+            ColumnLayout {
+                id: rootLayout
+                Layout.rightMargin: 30
+                Layout.leftMargin: 30
+                // --- Секция кодирования ---
 
-        ColumnLayout {
-            id: rootLayout
-            anchors.margins: 10
-            Layout.rightMargin: 30
-            Layout.leftMargin: 30
-            // --- Секция кодирования ---
-            GroupBox {
-                title: "Кодирование без проверки"
-                Layout.fillWidth: true
+                GroupBox {
+                    title: "Кодирование без проверки"
+                    Layout.fillWidth: true
 
-                GridLayout {
-                    columns: 3
-                    width: parent.width
-
-                    Label {
-                        text: "Входной файл:"
-                    }
-                    TextField {
-                        id: encodeInputPath
-                        Layout.fillWidth: true
-                        placeholderText: "Выберите файл для кодирования..."
-                    }
-                    Button {
-                        text: "Выбрать..."
-                        onClicked: {
-                            // Указываем диалогу, какое поле обновить
-                            openDialog.sourceTextField = encodeInputPath;
-                            openDialog.open();
+                    GridLayout {
+                        columns: 3
+                        width: parent.width
+                        FileInput {
+                            id: encodeInputPath
+                            Layout.columnSpan: 3
+                            labelText: "Входной файл:"
+                            placeholderText: "Выберите файл для кодирования..."
+                            onButtonClicked: {
+                                openDialog.sourceFileInput = encodeInputPath;
+                                openDialog.open();
+                            }
                         }
-                    }
-
-                    Label {
-                        text: "Выходной файл:"
-                    }
-                    TextField {
-                        id: encodeOutputPath
-                        Layout.fillWidth: true
-                        placeholderText: "Выбрать, куда сохранить выходной файл..."
-                    }
-                    Button {
-                        text: "Выбрать..."
-                        onClicked: {
-                            saveDialog.sourceTextField = encodeOutputPath;
-                            saveDialog.open();
+                        FileInput {
+                            id: encodeOutputPath
+                            Layout.columnSpan: 3
+                            labelText: "Выходной файл:"
+                            placeholderText: "Выбрать, куда сохранить выходной файл..."
+                            onButtonClicked: {
+                                saveDialog.sourceFileInput = encodeOutputPath;
+                                saveDialog.open();
+                            }
                         }
                     }
                 }
-            }
 
-            RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 10
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: 10
 
-                Button {
-                    text: "Кодировать"
-                    onClicked: {
-                        var success = coder.encodeGilbertMoore(encodeInputPath.text, encodeOutputPath.text);
-                        statusLabel.text = success ? "Успешно закодировано!" : "Кодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
-                        statusLabel.color = success ? "green" : "red";
-                    }
-                }
-                Button {
-                    text: "Декодировать"
-                    onClicked: {
-                        var success = coder.decodeGilbertMoore(encodeInputPath.text, encodeOutputPath.text);
-                        statusLabel.text = success ? "Успешно декодировано!" : "Декодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
-                        statusLabel.color = success ? "green" : "red";
-                    }
-                }
-            }
-
-            GroupBox {
-                title: "Проверка на четность"
-                Layout.fillWidth: true
-                Layout.topMargin: 15 // Небольшой отступ сверху
-
-                GridLayout {
-                    columns: 3
-                    width: parent.width
-
-                    // Поля для кодирования
-                    Label {
-                        text: "Входной файл:"
-                    }
-                    TextField {
-                        id: parityInputPath
-                        Layout.fillWidth: true
-                        placeholderText: "Выбрать входной файл для чтения..."
-                    }
                     Button {
-                        text: "Выбрать..."
+                        text: "Кодировать"
                         onClicked: {
-                            openDialog.sourceTextField = parityInputPath;
-                            openDialog.open();
+                            var success = coder.encodeGilbertMoore(encodeInputPath.filePath, encodeOutputPath.filePath);
+                            statusLabel.text = success ? "Успешно закодировано!" : "Кодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
+                            statusLabel.color = success ? "green" : "red";
                         }
                     }
-
-                    Label {
-                        text: "Выходной файл:"
-                    }
-                    TextField {
-                        id: parityOutputPath
-                        Layout.fillWidth: true
-                        placeholderText: "Выбрать куда сохранить выходной файл..."
-                    }
                     Button {
-                        text: "Выбрать..."
+                        text: "Декодировать"
                         onClicked: {
-                            saveDialog.sourceTextField = parityOutputPath;
-                            saveDialog.open();
+                            var success = coder.decodeGilbertMoore(encodeInputPath.filePath, encodeOutputPath.filePath);
+                            statusLabel.text = success ? "Успешно декодировано!" : "Декодирование завершилось с ошибкой. Смотрите консоль вывода для деталей.";
+                            statusLabel.color = success ? "green" : "red";
                         }
                     }
-                    Label {
-                        text: "Лог ошибок:"
-                        font.bold: true
-                        Layout.topMargin: 10
-                    }
-                    TextArea {
-                        id: parityErrorArea
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 80
-                        readOnly: true
-                        placeholderText: "Здесь будут отображаться ошибки декодирования..."
-                    }
                 }
-            }
 
-            RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 10
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
+                GroupBox {
+                    title: "Проверка на четность"
+                    Layout.fillWidth: true
+                    Layout.topMargin: 15 // Небольшой отступ сверху
 
-                Button {
-                    text: "Кодирование с проверкой на четность"
-                    onClicked: {
-                        var success = coder.encodeParity(parityInputPath.text, parityOutputPath.text);
-                        statusLabel.text = success ? "Кодирование с проверкой на четность прошло успепшно!" : "Кодирование с проверкой на четность завершилось с ошибкой.";
-                        statusLabel.color = success ? "green" : "red";
-                    }
-                }
-                Button {
-                    text: "Декодирование с проверкой на четность"
-                    onClicked: {
-                        var errorLog = coder.decodeParity(parityInputPath.text, parityOutputPath.text);
-                        parityErrorArea.text = errorLog != "false" ? errorLog : "";
-                        statusLabel.text = errorLog != "false" ? "Декодирование с проверкой на четность прошло успешно!" : "Декодирование с проверкой на четность завершилось с ошибкой.";
-                        statusLabel.color = errorLog != "false" ? "green" : "red";
-                    }
-                }
-            }
+                    GridLayout {
+                        columns: 3
+                        width: parent.width
 
-            GroupBox {
-                title: "Код хэмминга (9, 5)"
-                Layout.fillWidth: true
-                Layout.topMargin: 15 // Небольшой отступ сверху
-
-                GridLayout {
-                    columns: 3
-                    width: parent.width
-
-                    // Поля для кодирования
-                    Label {
-                        text: "Входной файл:"
-                    }
-                    TextField {
-                        id: hammingInputPath
-                        Layout.fillWidth: true
-                        placeholderText: "Выбрать входной файл для чтения..."
-                    }
-                    Button {
-                        text: "Выбрать..."
-                        onClicked: {
-                            openDialog.sourceTextField = hammingInputPath;
-                            openDialog.open();
+                        FileInput {
+                            id: parityInputPath
+                            Layout.columnSpan: 3
+                            labelText: "Входной файл:"
+                            placeholderText: "Выбрать входной файл для чтения..."
+                            onButtonClicked: {
+                                openDialog.sourceFileInput = parityInputPath;
+                                openDialog.open();
+                            }
+                        }
+                        FileInput {
+                            id: parityOutputPath
+                            Layout.columnSpan: 3
+                            labelText: "Выходной файл:"
+                            placeholderText: "Выбрать куда сохранить выходной файл..."
+                            onButtonClicked: {
+                                saveDialog.sourceFileInput = parityOutputPath;
+                                saveDialog.open();
+                            }
+                        }
+                        Label {
+                            text: "Лог ошибок:"
+                            font.bold: true
+                            Layout.topMargin: 10
+                        }
+                        TextArea {
+                            id: parityErrorArea
+                            Layout.columnSpan: 2
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 80
+                            wrapMode: TextArea.Wrap
+                            readOnly: true
+                            placeholderText: "Здесь будут отображаться ошибки декодирования..."
                         }
                     }
+                }
 
-                    Label {
-                        text: "Выходной файл:"
-                    }
-                    TextField {
-                        id: hammingOutputPath
-                        Layout.fillWidth: true
-                        placeholderText: "Выбрать куда сохранить выходной файл..."
-                    }
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: 10
+                    Layout.leftMargin: 10
+                    Layout.rightMargin: 10
+
                     Button {
-                        text: "Выбрать..."
+                        text: "Кодирование с проверкой на четность"
                         onClicked: {
-                            saveDialog.sourceTextField = hammingOutputPath;
-                            saveDialog.open();
+                            var success = coder.encodeParity(parityInputPath.filePath, parityOutputPath.filePath);
+                            statusLabel.text = success ? "Кодирование с проверкой на четность прошло успепшно!" : "Кодирование с проверкой на четность завершилось с ошибкой.";
+                            statusLabel.color = success ? "green" : "red";
                         }
                     }
-                    Label {
-                        text: "Лог ошибок:"
-                        font.bold: true
-                        Layout.topMargin: 10
-                    }
-                    TextArea {
-                        id: hammingErrorArea
-                        Layout.fillWidth: true
-                        Layout.minimumHeight: 80
-                        readOnly: true
-                        placeholderText: "Здесь будут отображаться ошибки декодирования..."
+                    Button {
+                        text: "Декодирование с проверкой на четность"
+                        onClicked: {
+                            var errorLog = coder.decodeParity(parityInputPath.filePath, parityOutputPath.filePath);
+                            parityErrorArea.text = errorLog != "false" ? errorLog : "";
+                            statusLabel.text = errorLog != "false" ? "Декодирование с проверкой на четность прошло успешно!" : "Декодирование с проверкой на четность завершилось с ошибкой.";
+                            statusLabel.color = errorLog != "false" ? "green" : "red";
+                        }
                     }
                 }
-            }
 
-            RowLayout {
-                Layout.alignment: Qt.AlignHCenter
-                Layout.topMargin: 10
-                Layout.leftMargin: 10
-                Layout.rightMargin: 10
+                GroupBox {
+                    title: "Код хэмминга (9, 5)"
+                    Layout.fillWidth: true
+                    Layout.topMargin: 15 // Небольшой отступ сверху
 
-                Button {
-                    text: "Кодирование с проверкой"
-                    onClicked: {
-                        var success = coder.encodeHamming(hammingInputPath.text, hammingOutputPath.text);
-                        statusLabel.text = success ? "Кодирование с проверкой прошло успепшно!" : "Кодирование с проверкой завершилось с ошибкой.";
-                        statusLabel.color = success ? "green" : "red";
+                    GridLayout {
+                        columns: 3
+                        width: parent.width
+
+                        FileInput {
+                            id: hammingInputPath
+                            Layout.columnSpan: 3
+                            labelText: "Входной файл:"
+                            placeholderText: "Выбрать входной файл для чтения..."
+                            onButtonClicked: {
+                                openDialog.sourceFileInput = hammingInputPath;
+                                openDialog.open();
+                            }
+                        }
+                        FileInput {
+                            id: hammingOutputPath
+                            Layout.columnSpan: 3
+                            labelText: "Выходной файл:"
+                            placeholderText: "Выбрать куда сохранить выходной файл..."
+                            onButtonClicked: {
+                                saveDialog.sourceFileInput = hammingOutputPath;
+                                saveDialog.open();
+                            }
+                        }
+                        Label {
+                            text: "Лог ошибок:"
+                            font.bold: true
+                            Layout.topMargin: 10
+                        }
+                        TextArea {
+                            id: hammingErrorArea
+                            Layout.columnSpan: 2
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 80
+                            readOnly: true
+                            wrapMode: TextArea.Wrap
+                            placeholderText: "Здесь будут отображаться ошибки декодирования..."
+                        }
                     }
                 }
-                Button {
-                    text: "Декодирование с проверкой"
-                    onClicked: {
-                        var errorLog = coder.decodeHamming(hammingInputPath.text, hammingOutputPath.text);
-                        hammingErrorArea.text = errorLog != "false" ? errorLog : "";
-                        statusLabel.text = errorLog != "false" ? "Декодирование с проверкой прошло успешно!" : "Декодирование с проверкой завершилось с ошибкой.";
-                        statusLabel.color = errorLog != "false" ? "green" : "red";
+
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.topMargin: 10
+                    Layout.leftMargin: 10
+                    Layout.rightMargin: 10
+
+                    Button {
+                        text: "Кодирование с проверкой"
+                        onClicked: {
+                            var success = coder.encodeHamming(hammingInputPath.filePath, hammingOutputPath.filePath);
+                            statusLabel.text = success ? "Кодирование с проверкой прошло успепшно!" : "Кодирование с проверкой завершилось с ошибкой.";
+                            statusLabel.color = success ? "green" : "red";
+                        }
+                    }
+                    Button {
+                        text: "Декодирование с проверкой"
+                        onClicked: {
+                            var errorLog = coder.decodeHamming(hammingInputPath.filePath, hammingOutputPath.filePath);
+                            hammingErrorArea.text = errorLog != "false" ? errorLog : "";
+                            statusLabel.text = errorLog != "false" ? "Декодирование с проверкой прошло успешно!" : "Декодирование с проверкой завершилось с ошибкой.";
+                            statusLabel.color = errorLog != "false" ? "green" : "red";
+                        }
                     }
                 }
-            }
 
-            // --- Статус бар ---
-            Label {
-                id: statusLabel
-                Layout.fillWidth: true
-                Layout.topMargin: 15
-                Layout.bottomMargin: 15
-                horizontalAlignment: Text.AlignHCenter
-                font.bold: true
-                text: "Готово"
+                // --- Статус бар ---
+                Label {
+                    id: statusLabel
+                    Layout.fillWidth: true
+                    Layout.topMargin: 15
+                    Layout.bottomMargin: 15
+                    horizontalAlignment: Text.AlignHCenter
+                    font.bold: true
+                    text: "Готово"
+                }
             }
         }
         ColumnLayout {
             id: helplayout
-            anchors.margins: 10
             Layout.rightMargin: 10
             Label {
                 text: "Вспомогательные функции"
@@ -333,26 +305,19 @@ ApplicationWindow {
                         TextArea {
                             id: toHammingFromHumanMsg
                             Layout.fillWidth: true
-                            Layout.minimumHeight: 40
+                            Layout.preferredHeight: 40
+                            wrapMode: TextArea.Wrap
                             placeholderText: "Напишите сообщение для кодирования. Пример: 4 8 15 16 23 4 2"
                         }
                     }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Label {
-                            text: "Входной файл:"
-                        }
-                        TextField {
-                            id: toHammingFromHumanFile
-                            Layout.fillWidth: true
-                            placeholderText: "Выбрать куда сохранить файл с сообщением..."
-                        }
-                        Button {
-                            text: "Выбрать..."
-                            onClicked: {
-                                saveDialog.sourceTextField = toHammingFromHumanFile;
-                                saveDialog.open();
-                            }
+                    FileInput {
+                        id: toHammingFromHumanFile
+                        Layout.columnSpan: 3
+                        labelText: "Выходной файл:"
+                        placeholderText: "Выбрать куда сохранить файл с сообщением..."
+                        onButtonClicked: {
+                            saveDialog.sourceFileInput = toHammingFromHumanFile;
+                            saveDialog.open();
                         }
                     }
                     RowLayout {
@@ -360,61 +325,53 @@ ApplicationWindow {
                         ColumnLayout {
                             id: help1butns
                             Layout.fillWidth: true
-                        Button {
-                            id: help1butns1
-                            text: "Результат: "
-                            font.bold: true
-                            Layout.topMargin: 10
-                            onClicked: {
-                                toHammingFromHumanResult.text = coder.humanToHamming(toHammingFromHumanFile.text, toHammingFromHumanMsg.text);
+                            Button {
+                                id: help1butns1
+                                text: "Результат: "
+                                font.bold: true
+                                Layout.topMargin: 10
+                                onClicked: {
+                                    toHammingFromHumanResult.text = coder.humanToHamming(toHammingFromHumanFile.filePath, toHammingFromHumanMsg.text);
+                                }
                             }
-                        }
-                        Button {
-                            text: "Обратно: "
-                            font.bold: true
-                            Layout.topMargin: 1
-                            Layout.minimumWidth: help1butns1.width
-                            onClicked: {
-                                var result = coder.hammingToHuman(toHammingFromHumanFile.text); 
-                                toHammingFromHumanResult.text = result.file
-                                toHammingFromHumanMsg.text = result.message
+                            Button {
+                                text: "Обратно: "
+                                font.bold: true
+                                Layout.topMargin: 1
+                                Layout.minimumWidth: help1butns1.width
+                                onClicked: {
+                                    var result = coder.hammingToHuman(toHammingFromHumanFile.filePath);
+                                    toHammingFromHumanResult.text = result.file;
+                                    toHammingFromHumanMsg.text = result.message;
+                                }
                             }
-                        }
                         }
                         TextArea {
                             id: toHammingFromHumanResult
                             Layout.fillWidth: true
-                            Layout.minimumHeight: help1butns.height
+                            Layout.preferredHeight: help1butns.height
+                            wrapMode: TextArea.Wrap
                             readOnly: true
                             placeholderText: "Результат кодирования..."
                         }
                     }
                 }
             }
-            RowLayout {
-                        Layout.fillWidth: true
-                        Label {
-                            text: "Входной файл:"
-                        }
-                        TextField {
-                            id: interferenceFile
-                            Layout.fillWidth: true
-                            placeholderText: "Выбрать куда сохранить файл с сообщением..."
-                        }
-                        Button {
-                            text: "Выбрать..."
-                            onClicked: {
-                                saveDialog.sourceTextField = interferenceFile;
-                                saveDialog.open();
-                            }
-                        }
-                    }
-                    Button {
-                        Layout.fillWidth: true
-                        onClicked: {
-                            coder.interference(interferenceFile.text)
-                        }
-                    }
+            FileInput {
+                id: interferenceFile
+                labelText: "Входной файл:"
+                placeholderText: "Выбрать входной файл для чтения..."
+                onButtonClicked: {
+                    openDialog.sourceFileInput = interferenceFile;
+                    openDialog.open();
+                }
+            }
+            Button {
+                Layout.fillWidth: true
+                onClicked: {
+                    coder.interference(interferenceFile.filePath);
+                }
+            }
         }
     }
 }
