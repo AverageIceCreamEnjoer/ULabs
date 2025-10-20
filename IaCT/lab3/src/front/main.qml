@@ -15,7 +15,7 @@ ApplicationWindow {
     id: root
     //width: 800
     height: 600
-    minimumWidth: rootLayout.implicitWidth * 2
+    minimumWidth: rootLayout.implicitWidth * 2 + 30
     //minimumHeight: rootLayout.implicitHeight
     visible: true
     //Material.theme: Material.Light
@@ -65,14 +65,13 @@ ApplicationWindow {
     RowLayout {
         anchors.fill: parent
         ScrollView {
-            Layout.fillWidth: true
+            width: rootLayout.implicitWidth + 20
             Layout.fillHeight: true
             clip: true
-            padding: 10
             ColumnLayout {
                 id: rootLayout
-                Layout.rightMargin: 30
-                Layout.leftMargin: 30
+                Layout.rightMargin: 10
+                Layout.leftMargin: 10
                 // --- Секция кодирования ---
 
                 GroupBox {
@@ -126,12 +125,10 @@ ApplicationWindow {
                         }
                     }
                 }
-
                 GroupBox {
                     title: "Проверка на четность"
                     Layout.fillWidth: true
                     Layout.topMargin: 15 // Небольшой отступ сверху
-
                     GridLayout {
                         columns: 3
                         width: parent.width
@@ -161,12 +158,9 @@ ApplicationWindow {
                             font.bold: true
                             Layout.topMargin: 10
                         }
-                        TextArea {
+                        StyledTextArea {
                             id: parityErrorArea
                             Layout.columnSpan: 2
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 80
-                            wrapMode: TextArea.Wrap
                             readOnly: true
                             placeholderText: "Здесь будут отображаться ошибки декодирования..."
                         }
@@ -232,13 +226,10 @@ ApplicationWindow {
                             font.bold: true
                             Layout.topMargin: 10
                         }
-                        TextArea {
+                        StyledTextArea {
                             id: hammingErrorArea
                             Layout.columnSpan: 2
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 80
                             readOnly: true
-                            wrapMode: TextArea.Wrap
                             placeholderText: "Здесь будут отображаться ошибки декодирования..."
                         }
                     }
@@ -283,7 +274,9 @@ ApplicationWindow {
         }
         ColumnLayout {
             id: helplayout
+            Layout.leftMargin: 10
             Layout.rightMargin: 10
+            width: rootLayout.implicitWidth
             Label {
                 text: "Вспомогательные функции"
             }
@@ -302,11 +295,9 @@ ApplicationWindow {
                         Label {
                             text: "Сообщение"
                         }
-                        TextArea {
+                        StyledTextArea {
                             id: toHammingFromHumanMsg
-                            Layout.fillWidth: true
                             Layout.preferredHeight: 40
-                            wrapMode: TextArea.Wrap
                             placeholderText: "Напишите сообщение для кодирования. Пример: 4 8 15 16 23 4 2"
                         }
                     }
@@ -346,11 +337,9 @@ ApplicationWindow {
                                 }
                             }
                         }
-                        TextArea {
+                        StyledTextArea {
                             id: toHammingFromHumanResult
-                            Layout.fillWidth: true
                             Layout.preferredHeight: help1butns.height
-                            wrapMode: TextArea.Wrap
                             readOnly: true
                             placeholderText: "Результат кодирования..."
                         }

@@ -3,5 +3,6 @@
     <file>main.qml</file>
     <file>MyComponents/qmldir</file>
     <file>MyComponents/fileInput.qml</file>
+    <file>MyComponents/styledTextArea.qml</file>
 </qresource>
 </RCC>
