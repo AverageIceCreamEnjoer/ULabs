@@ -46,21 +46,17 @@ QString CodingAlgorithms::GilbertMoore::stringToBits(const QString& text) {
   return bits;
 }
 
-QString CodingAlgorithms::GilbertMoore::bitsToString(const QString& bits) {
+QString CodingAlgorithms::GilbertMoore::bitsToString(const QString& bits,
+                                                     QString& err_message) {
   QString text = "";
-  if (bits.length() % m_bitSymbolSize != 0) {
-    qWarning()
-        << "Ошибка: неверная длина последовательности бит. Должна делиться на "
-           "m_bitSymbolSize ="
-        << m_bitSymbolSize;
-    return "";
-  }
   for (int i = 0; i < bits.length(); i += m_bitSymbolSize) {
     QString ch = bits.mid(i, m_bitSymbolSize);
     if (!m_encodedCharToIndex.contains(ch)) {
-      qWarning() << "Ошибка: не получилось конвертировать последовательность "
-                    "бит в символ:"
-                 << ch;
+      err_message.append(
+          "Ошибка: не получилось конвертировать последовательность "
+          "бит в символ:" +
+          ch + "\n");
+      text.append("~~");
     } else
       text.append(m_alphabet[m_encodedCharToIndex[ch]]);
   }
@@ -159,7 +155,7 @@ bool CodingAlgorithms::GilbertMoore::encode(const QString& inputFilePath,
   qInfo() << "Сообщение для кодирования:" << message;
   QString binaryCode = stringToBits(message);
   if (!binaryCode.isEmpty()) {
-    result = saveFile(outputFilePath, binaryCode, message.length() / 2);
+    result = saveFile(outputFilePath, binaryCode);
     if (!result) {
       return false;
     }
@@ -179,14 +175,22 @@ bool CodingAlgorithms::encodeGilbertMoore(const QString& inputFilePath,
 
 bool CodingAlgorithms::GilbertMoore::decode(const QString& inputFilePath,
                                             const QString& outputFilePath) {
-  int messageLength;
   QString binaryCode;
-  bool result = openFile(inputFilePath, binaryCode, &messageLength);
+  bool result = openFile(inputFilePath, binaryCode);
   if (!result) {
     return false;
   }
-  qInfo() << "Decoding code:" << binaryCode << "with length:" << messageLength;
-  QString decodedMessage = bitsToString(binaryCode);
+  qInfo() << "Decoding code:" << binaryCode;
+  if (binaryCode.length() % m_bitSymbolSize != 0) {
+    qWarning()
+        << "Ошибка: неверная длина последовательности бит. Должна делиться на "
+           "m_bitSymbolSize ="
+        << m_bitSymbolSize;
+    return false;
+  }
+  QString err;
+  QString decodedMessage = bitsToString(binaryCode, err);
+  qWarning() << err;
   if (!decodedMessage.isEmpty()) {
     result = saveFile(outputFilePath, decodedMessage);
     if (!result) {
@@ -234,8 +238,7 @@ bool CodingAlgorithms::GilbertMoore::encodeParity(
                << m_bitSymbolSize << "бита (четной длины).";
   }
 
-  result =
-      saveFile(outputFilePath, encodedBits, bits.length() / m_bitSymbolSize);
+  result = saveFile(outputFilePath, encodedBits);
   if (!result) {
     return false;
   }
@@ -251,8 +254,7 @@ bool CodingAlgorithms::encodeParity(const QString& inputFilePath,
 QString CodingAlgorithms::GilbertMoore::decodeParity(
     const QString& inputFilePath, const QString& outputFilePath) {
   QString encodedBits;
-  int messageLength;
-  bool result = openFile(inputFilePath, encodedBits, &messageLength);
+  bool result = openFile(inputFilePath, encodedBits);
   if (!result) {
     return "false";
   }
@@ -278,9 +280,16 @@ QString CodingAlgorithms::GilbertMoore::decodeParity(
                << m_bitSymbolSize << "бита (четной длины).";
     return "false";
   }
-  qInfo() << "Раскодированные биты:" << decodedBits;
-  auto decodedMessage = bitsToString(decodedBits);
-  if (decodedMessage.length() / 2 != messageLength) {
+  if (decodedBits.length() % m_bitSymbolSize != 0) {
+    qWarning()
+        << "Ошибка: неверная длина последовательности бит. Должна делиться на "
+           "m_bitSymbolSize ="
+        << m_bitSymbolSize;
+    return "false";
+  }
+  auto decodedMessage = bitsToString(decodedBits, errorLog);
+  if (decodedMessage.length() / 2 !=
+      encodedBits.length() / 3 * 2 / m_bitSymbolSize) {
     errorLog.append(
         "Длина раскодированного сообщения не совпадает с оригинальной.\n");
   }
@@ -539,13 +548,11 @@ bool CodingAlgorithms::interference(const QString& inputFilePath,
     bool changed = false;
     for (int i = 0; i < message.length(); ++i) {
       if ((i - lastChanged) % blockSize == 0) {
-        qInfo() << i;
         changed = false;
       }
       if (!changed && static_cast<double>(rand()) / RAND_MAX < interference) {
         message[i] = (message[i] == '0') ? '1' : '0';
         lastChanged = i;
-        qInfo() << "Интерференция в бите" << i << blockSize << changed;
         changed = true;
       }
     }

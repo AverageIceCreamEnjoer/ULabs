@@ -50,7 +50,7 @@ class CodingAlgorithms : public QObject {
                          const QString& outputFilePath);
 
     QString stringToBits(const QString& text);
-    QString bitsToString(const QString& bits);
+    QString bitsToString(const QString& bits, QString& err_message);
     QString doubleToBinaryString(double value, int precision);
     double binaryStringToDouble(const QString& bits);
     QString XOR(const QString& a, const QString& b);
