@@ -29,7 +29,7 @@ class CodingAlgorithms : public QObject {
   Q_INVOKABLE QString humanToHamming(const QString& outputFilePath,
                                      const QString& message);
   Q_INVOKABLE QVariantMap hammingToHuman(const QString& inputFilePath);
-  Q_INVOKABLE bool interference(const QString& inputFilePath);
+  Q_INVOKABLE bool interference(const QString& inputFilePath, int blockSize);
 
  protected:
   static bool openFile(const QString& filePath, QString& message,

@@ -64,20 +64,18 @@ ApplicationWindow {
 
     RowLayout {
         anchors.fill: parent
+        Layout.topMargin: 15
         ScrollView {
             width: rootLayout.implicitWidth + 20
             Layout.fillHeight: true
+            Layout.rightMargin: 10
+            Layout.leftMargin: 10
             clip: true
             ColumnLayout {
                 id: rootLayout
-                Layout.rightMargin: 10
-                Layout.leftMargin: 10
-                // --- Секция кодирования ---
-
                 GroupBox {
                     title: "Кодирование без проверки"
                     Layout.fillWidth: true
-
                     GridLayout {
                         columns: 3
                         width: parent.width
@@ -107,7 +105,6 @@ ApplicationWindow {
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.topMargin: 10
-
                     Button {
                         text: "Кодировать"
                         onClicked: {
@@ -346,19 +343,42 @@ ApplicationWindow {
                     }
                 }
             }
-            FileInput {
-                id: interferenceFile
-                labelText: "Входной файл:"
-                placeholderText: "Выбрать входной файл для чтения..."
-                onButtonClicked: {
-                    openDialog.sourceFileInput = interferenceFile;
-                    openDialog.open();
-                }
-            }
-            Button {
+            GroupBox {
+                title: "Генерировать помехи в сообщении"
                 Layout.fillWidth: true
-                onClicked: {
-                    coder.interference(interferenceFile.filePath);
+                Layout.topMargin: 15
+                ColumnLayout {
+                    width: parent.width
+                    FileInput {
+                        id: interferenceFile
+                        Layout.fillWidth: true
+                        labelText: "Входной файл:"
+                        placeholderText: "Выбрать входной файл для чтения..."
+                        onButtonClicked: {
+                            openDialog.sourceFileInput = interferenceFile;
+                            openDialog.open();
+                        }
+                    }
+                    Slider {
+                        id: interferenceBlock
+                        from: 1
+                        to: 10
+                        stepSize: 1
+                        value: 9
+                        snapMode: Slider.SnapAlways
+                        Layout.fillWidth: true
+                        Label {
+                            text: "Длина кодового слова: " + interferenceBlock.value
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+                    }
+                    Button {
+                        Layout.fillWidth: true
+                        text: "Сгенерировать помехи"
+                        onClicked: {
+                            coder.interference(interferenceFile.filePath, interferenceBlock.value);
+                        }
+                    }
                 }
             }
         }

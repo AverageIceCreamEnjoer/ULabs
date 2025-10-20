@@ -260,7 +260,7 @@ QString CodingAlgorithms::GilbertMoore::decodeParity(
   QString errorLog = "";
 
   if (encodedBits.length() % 3 == 0) {
-    for (int i = 0; i < encodedBits.length() - 2; i += 3) {
+    for (int i = 0; i < encodedBits.length(); i += 3) {
       auto b1 = encodedBits[i];
       auto b2 = encodedBits[i + 1];
       auto p = encodedBits[i + 2];
@@ -278,6 +278,7 @@ QString CodingAlgorithms::GilbertMoore::decodeParity(
                << m_bitSymbolSize << "бита (четной длины).";
     return "false";
   }
+  qInfo() << "Раскодированные биты:" << decodedBits;
   auto decodedMessage = bitsToString(decodedBits);
   if (decodedMessage.length() / 2 != messageLength) {
     errorLog.append(
@@ -507,11 +508,11 @@ QVariantMap CodingAlgorithms::hammingToHuman(const QString& inputFilePath) {
     } else {
       message = "";
       for (const auto& symbol : symbols) {
-        if (m_hamming.m_charToIndex.contains(symbol)) {
+        if (symbol == "~~~~~") {
+          message.append("~ ");
+        } else if (m_hamming.m_charToIndex.contains(symbol)) {
           message.append(QString::number(m_hamming.m_charToIndex[symbol]) +
                          " ");
-        } else if (symbol == "~~~~~") {
-          message.append("~ ");
         } else {
           qWarning()
               << "Ошибка: не удалось декодировать сообщение кода Хэмминга "
@@ -528,18 +529,25 @@ QVariantMap CodingAlgorithms::hammingToHuman(const QString& inputFilePath) {
   return result;
 }
 
-bool CodingAlgorithms::interference(const QString& inputFilePath) {
+bool CodingAlgorithms::interference(const QString& inputFilePath,
+                                    int blockSize) {
   QString message;
   bool result = openFile(inputFilePath, message);
   double interference = 0.4;
+  int lastChanged = 0;
   if (result) {
     bool changed = false;
     for (int i = 0; i < message.length(); ++i) {
+      if ((i - lastChanged) % blockSize == 0) {
+        qInfo() << i;
+        changed = false;
+      }
       if (!changed && static_cast<double>(rand()) / RAND_MAX < interference) {
         message[i] = (message[i] == '0') ? '1' : '0';
+        lastChanged = i;
+        qInfo() << "Интерференция в бите" << i << blockSize << changed;
         changed = true;
       }
-      if (i % 9 == 0) changed = false;
     }
     result = saveFile(inputFilePath, message);
   }
