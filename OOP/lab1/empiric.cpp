@@ -29,7 +29,7 @@ ld _randNum() {
 }
 }  // namespace
 
-void initEmpiric(EmpiricDist& emp, const array_t& x) {
+void initEmpiric(Empiric& emp, const array_t& x) {
   emp.xi.length = x.length;
   emp.xi.data = new ld[x.length];
   for (uint32_t i = 0; i < x.length; ++i) emp.xi.data[i] = x.data[i];
@@ -67,7 +67,7 @@ void initEmpiric(EmpiricDist& emp, const array_t& x) {
   }*/
 }
 
-ld densityEmp(const EmpiricDist& emp, ld x) {
+ld densityEmp(const Empiric& emp, ld x) {
   if (x < emp.X.data[0] || x > emp.X.data[emp.X.length - 1]) return 0.0L;
   for (uint32_t i = 0; i < emp.k; ++i) {
     if (x >= emp.X.data[i] && x < emp.X.data[i + 1])
@@ -78,7 +78,7 @@ ld densityEmp(const EmpiricDist& emp, ld x) {
   return 0;
 }
 
-array_t densityEmpArray(const EmpiricDist& emp, const array_t& x) {
+array_t densityEmpArray(const Empiric& emp, const array_t& x) {
   array_t res{x.length, new ld[x.length]};
   for (uint32_t i = 0; i < x.length; ++i) {
     res.data[i] = densityEmp(emp, x.data[i]);
@@ -86,13 +86,13 @@ array_t densityEmpArray(const EmpiricDist& emp, const array_t& x) {
   return res;
 }
 
-ld MEmp(const EmpiricDist& emp) {
+ld MEmp(const Empiric& emp) {
   ld sum = 0;
   for (uint32_t i = 0; i < emp.xi.length; ++i) sum += emp.xi.data[i];
   return sum / emp.xi.length;
 }
 
-ld DEmp(const EmpiricDist& emp) {
+ld DEmp(const Empiric& emp) {
   ld m = MEmp(emp);
   ld sum = 0;
   for (uint32_t i = 0; i < emp.xi.length; ++i)
@@ -100,7 +100,7 @@ ld DEmp(const EmpiricDist& emp) {
   return sum / emp.xi.length;
 }
 
-ld G1Emp(const EmpiricDist& emp) {
+ld G1Emp(const Empiric& emp) {
   ld m = MEmp(emp);
   ld d = DEmp(emp);
   ld sum = 0;
@@ -109,7 +109,7 @@ ld G1Emp(const EmpiricDist& emp) {
   return sum / emp.xi.length / pow(d, 1.5);
 }
 
-ld G2Emp(const EmpiricDist& emp) {
+ld G2Emp(const Empiric& emp) {
   ld m = MEmp(emp);
   ld d = DEmp(emp);
   ld sum = 0;
@@ -118,7 +118,7 @@ ld G2Emp(const EmpiricDist& emp) {
   return sum / emp.xi.length / pow(d, 2) - 3;
 }
 
-ld XiEmp(const EmpiricDist& emp) {
+ld XiEmp(const Empiric& emp) {
   ld r = _randNum();
   ld cumulative = 0;
   for (uint32_t i = 0; i < emp.k; ++i) {
@@ -130,7 +130,7 @@ ld XiEmp(const EmpiricDist& emp) {
   return emp.X.data[emp.k - 1];
 }
 
-array_t XiEmpArray(const EmpiricDist& emp, uint32_t size) {
+array_t XiEmpArray(const Empiric& emp, uint32_t size) {
   array_t res{size, new ld[size]};
   for (uint32_t i = 0; i < size; ++i) {
     res.data[i] = XiEmp(emp);

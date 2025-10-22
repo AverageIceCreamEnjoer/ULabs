@@ -65,7 +65,7 @@ ld XiMixt(const Mixture& mixt);
 array_t XiMixtArray(const Mixture& mixt, uint32_t size);
 
 // Эмпирическое распределение - функция плотности
-struct EmpiricDist {
+struct Empiric {
   array_t X;    // интервалы
   array_t xi;   // начальная выборка
   uint32_t k;   // количество интервалов
@@ -73,22 +73,22 @@ struct EmpiricDist {
   uint32_t* n;  // количество элементов в интервале
 };
 
-void initEmpiric(EmpiricDist& emp, const array_t& x);
+void initEmpiric(Empiric& emp, const array_t& x);
 // значение функции плотности распределения от 1 аргумента
-ld densityEmp(const EmpiricDist& emp, ld x);
+ld densityEmp(const Empiric& emp, ld x);
 // значение функции плотности распределения от массива аргументов
-array_t densityEmpArray(const EmpiricDist& emp, const array_t& x);
+array_t densityEmpArray(const Empiric& emp, const array_t& x);
 
 // Математическое ожидание
-ld MEmp(const EmpiricDist& emp);
+ld MEmp(const Empiric& emp);
 // Дисперсия
-ld DEmp(const EmpiricDist& emp);
+ld DEmp(const Empiric& emp);
 // Коэффициент ассиметрии
-ld G1Emp(const EmpiricDist& emp);
+ld G1Emp(const Empiric& emp);
 // Коэффициент эксцесса
-ld G2Emp(const EmpiricDist& emp);
+ld G2Emp(const Empiric& emp);
 
 // Моделирование случайной величины
-ld XiEmp(const EmpiricDist& emp);
+ld XiEmp(const Empiric& emp);
 // Моделирование случайной величины
-array_t XiEmpArray(const EmpiricDist& emp, uint32_t size);
+array_t XiEmpArray(const Empiric& emp, uint32_t size);
