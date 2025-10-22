@@ -199,7 +199,7 @@ void testAllMainDistMethods() {
   // 6.3. Не удалось открыть файл
   try {
     MainDist("non_existent_file.txt");
-  } catch (const std::invalid_argument& e) {
+  } catch (const std::runtime_error& e) {
     std::cout
         << "   - Успех: перехвачено исключение для несуществующего файла: "
         << e.what() << std::endl;

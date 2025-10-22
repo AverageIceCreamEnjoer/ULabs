@@ -7,6 +7,8 @@ using ld = long double;
 
 namespace nstu {
 
+const ld pi = 3.14159265358979;
+
 inline ld randNum() {
   ld r;
   do {
@@ -212,8 +214,8 @@ class vector {
 
   iterator begin() noexcept { return iterator(data.get()); }
   iterator end() noexcept { return iterator(data.get() + length); }
-  const_iterator cbegin() const noexcept { return const_iterator(data.get()); }
-  const_iterator cend() const noexcept {
+  const_iterator begin() const noexcept { return const_iterator(data.get()); }
+  const_iterator end() const noexcept {
     return const_iterator(data.get() + length);
   }
 

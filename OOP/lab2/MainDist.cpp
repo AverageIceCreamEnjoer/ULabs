@@ -4,6 +4,8 @@
 #include <cmath>
 #include <fstream>
 
+MainDist::MainDist() : m_nu(1.0), m_mu(0.0), m_lambda(1.0) {}
+
 MainDist::MainDist(ld nu, ld mu, ld lambda)
     : m_nu(nu), m_mu(mu), m_lambda(lambda) {
   if (lambda == 0) throw std::invalid_argument("Лямбда не может быть 0");
@@ -12,7 +14,7 @@ MainDist::MainDist(ld nu, ld mu, ld lambda)
 
 MainDist::MainDist(std::string file_name) {
   std::ifstream file(file_name);
-  if (!file.is_open()) throw std::invalid_argument("Не удалось открыть файл");
+  if (!file.is_open()) throw std::runtime_error("Не удалось открыть файл");
   file >> m_nu >> m_mu >> m_lambda;
   if (m_lambda == 0) throw std::invalid_argument("Лямбда не может быть 0");
   if (m_nu == 0) throw std::invalid_argument("Нулевое значение nu");
@@ -126,7 +128,7 @@ ld MainDist::Xi() const noexcept {
   } while (-log(r2) <= (m_nu - delta) * t / 2 + m_nu / (2 * t) -
                            sqrt(m_nu * (m_nu - delta)));
   ld r3 = nstu::randNum(), r4 = nstu::randNum();
-  ld z = sqrt(-2 * log(r3)) * cos(2 * pi * r4);
+  ld z = sqrt(-2 * log(r3)) * cos(2 * nstu::pi * r4);
   // z = sqrt(-2 * log(r3)) * sin(2 * pi * r4);
   return z * sqrt(t) * m_lambda + m_mu;
 }
