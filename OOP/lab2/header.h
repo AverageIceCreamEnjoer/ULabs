@@ -130,7 +130,7 @@ class vector {
     this->length = length;
     data = std::unique_ptr<ld[]>(new ld[full_length]);
     if (!data) throw std::bad_alloc();
-    if (value != 0) std::fill(data.get(), data.get() + length, value);
+    std::fill(data.get(), data.get() + length, value);
   }
 
   vector(std::initializer_list<ld> list)
