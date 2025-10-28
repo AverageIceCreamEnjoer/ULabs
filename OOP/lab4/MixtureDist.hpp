@@ -6,7 +6,7 @@
 #include "IPersistent.hpp"
 
 template <typename dist1_t, typename dist2_t>
-class MixtureDist : public IDist, private IPersistent {
+class MixtureDist : public IDist, public IPersistent {
   static_assert(std::is_base_of<IDist, dist1_t>::value,
                 "dist1_t должен наследоваться от IDist");
   static_assert(std::is_base_of<IDist, dist2_t>::value,
@@ -16,8 +16,6 @@ class MixtureDist : public IDist, private IPersistent {
   ld m_p;           // Параметр смеси
   dist1_t m_dist1;  // Первый компонент
   dist2_t m_dist2;  // Второй компонент
-
-  // std::unique_ptr<MixtureDist> copy() const noexcept override;
 
  public:
   // Конструкторы
@@ -48,6 +46,7 @@ class MixtureDist : public IDist, private IPersistent {
   void save(std::ofstream& file) const noexcept override;
   void load(const std::string& file_name) override;
   void load(std::ifstream& file) override;
+
   // Геттеры
 
   // Получить первый компонент

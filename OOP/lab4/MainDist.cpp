@@ -38,7 +38,7 @@ void MainDist::save(const std::string& file_name) const {
 
 void MainDist::save(std::ofstream& file) const noexcept {
   file << "MainDist ";
-  file << m_nu << " " << m_mu << " " << m_lambda;
+  file << m_nu << " " << m_mu << " " << m_lambda << " ";
 }
 
 MainDist::MainDist(std::initializer_list<ld> list) {

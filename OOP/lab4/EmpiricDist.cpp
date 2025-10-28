@@ -1,7 +1,6 @@
 #include "EmpiricDist.hpp"
 
 #include <cmath>
-#include <fstream>
 
 EmpiricDist::EmpiricDist()
     : m_init_sample(),
@@ -23,6 +22,17 @@ EmpiricDist::EmpiricDist(const nstu::vector& init_sample, uint32_t k)
     if (i > m_max) m_max = i;
   }
   m_delta = (m_max - m_min) / m_interval_freq.size();
+  static int n = 0;
+  if (n == 0) {
+    std::ofstream file("logini.txt");
+    file << m_init_sample.size() << "\n";
+    file << m_k << "\n";
+    file << m_min << "\n";
+    file << m_max << "\n";
+    file << m_delta << "\n";
+    for (const ld i : m_interval_freq) file << i << " ";
+    n++;
+  }
   for (const ld x : m_init_sample) {
     uint32_t index = std::min(static_cast<uint32_t>((x - m_min) / m_delta),
                               m_interval_freq.size() - 1);
@@ -33,19 +43,22 @@ EmpiricDist::EmpiricDist(const nstu::vector& init_sample, uint32_t k)
   }
 }
 
-EmpiricDist::EmpiricDist(uint32_t n, MainDist& dist, uint32_t k)
+EmpiricDist::EmpiricDist(uint32_t n, IDist& dist, uint32_t k)
     : EmpiricDist(dist.Xi(n), k) {}
 
-EmpiricDist::EmpiricDist(uint32_t n, MixtureDist& dist, uint32_t k)
-    : EmpiricDist(dist.Xi(n), k) {}
-
-EmpiricDist::EmpiricDist(uint32_t n, EmpiricDist& dist, uint32_t k)
-    : EmpiricDist(dist.Xi(n), k) {}
-
-EmpiricDist::EmpiricDist(std::string file_name) {
+void EmpiricDist::load(const std::string& file_name) {
   std::ifstream file(file_name);
   if (!file.is_open())
     throw std::runtime_error("Не удалось открыть файл " + file_name);
+  load(file);
+  file.close();
+}
+
+void EmpiricDist::load(std::ifstream& file) {
+  std::string name;
+  file >> name;
+  if (name != "EmpiricDist")
+    throw std::runtime_error("Неверный тип распределения");
   file >> m_k;
   uint32_t sample_size;
   file >> sample_size;
@@ -56,7 +69,6 @@ EmpiricDist::EmpiricDist(std::string file_name) {
   for (ld& i : m_init_sample) {
     file >> i;
   }
-  file.close();
   *this = EmpiricDist(m_init_sample, m_k);
 }
 
@@ -64,12 +76,17 @@ void EmpiricDist::save(const std::string& file_name) const {
   std::ofstream file(file_name);
   if (!file.is_open())
     throw std::runtime_error("Не удалось открыть файл " + file_name);
-  file << m_k << "\n";
-  file << m_init_sample.size() << "\n";
+  save(file);
+  file.close();
+}
+
+void EmpiricDist::save(std::ofstream& file) const noexcept {
+  file << "EmpiricDist ";
+  file << m_k << " ";
+  file << m_init_sample.size() << " ";
   for (const ld i : m_init_sample) {
     file << i << " ";
   }
-  file.close();
 }
 
 EmpiricDist::EmpiricDist(const EmpiricDist& other)
@@ -143,6 +160,13 @@ ld EmpiricDist::density(ld x) const noexcept {
   if (x < m_min || x > m_max) return 0;
   uint32_t index =
       std::min(static_cast<uint32_t>((x - m_min) / m_delta), m_k - 1);
+  static int n = 0;
+  if (n == 0) {
+    std::ofstream file("log" + std::to_string(n++) + ".txt");
+    for (uint32_t i = 0; i < m_k; ++i) {
+      file << m_interval_freq[i] << "\n";
+    }
+  }
   return m_interval_freq[index] / m_delta;
 }
 

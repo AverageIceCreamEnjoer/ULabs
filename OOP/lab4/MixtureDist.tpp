@@ -7,12 +7,6 @@
 template <typename dist1_t, typename dist2_t>
 MixtureDist<dist1_t, dist2_t>::MixtureDist() : m_p(0.5), m_dist1(), m_dist2() {}
 
-/*template <typename dist1_t, typename dist2_t>
-std::unique_ptr<MixtureDist> MixtureDist<dist1_t, dist2_t>::copy()
-    const noexcept {
-  return std::make_unique(new MixtureDist(*this));
-}*/
-
 template <typename dist1_t, typename dist2_t>
 MixtureDist<dist1_t, dist2_t>::MixtureDist(ld p, const dist1_t& dist1,
                                            const dist2_t& dist2)

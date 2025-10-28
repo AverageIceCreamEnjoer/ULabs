@@ -3,10 +3,10 @@
 // подключаем заголовочный файл с nstu::vector из предыдущей лабы
 #include "../lab2/header.h"
 // подключаем заголовочный файл с MainDist из предыдущей лабы
-#include "../lab2/MainDist.hpp"
-#include "MixtureDist.hpp"
+#include "IDist.hpp"
+#include "IPersistent.hpp"
 
-class EmpiricDist {
+class EmpiricDist : public IDist, public IPersistent {
  private:
   nstu::vector m_init_sample;    // Начальная выборка
   uint32_t m_k;                  // Количество интервалов
@@ -30,41 +30,20 @@ class EmpiricDist {
   explicit EmpiricDist(const nstu::vector& init_sample, uint32_t k = 0);
   /**
    * Конструктор с параметром основного распределения
-   * @param n Размер выборки, которая будет сгенерирована из основного
-   * распределения.
+   * @param n Размер выборки, которая будет сгенерирована из распределения.
    * @param dist Основное распределение, из которого генерируется выборка.
    * @param k Количество интервалов. По умолчанию рассчитывается по формуле
    * Стёрджеса.
    */
-  explicit EmpiricDist(uint32_t n, MainDist& dist, uint32_t k = 0);
-  /**
-   * Конструктор с параметром смеси распределений
-   * @param n Размер выборки, которая будет сгенерирована из основного
-   * распределения.
-   * @param dist Смесь распределений, из которой генерируется выборка.
-   * @param k Количество интервалов. По умолчанию рассчитывается по формуле
-   * Стёрджеса.
-   */
-  explicit EmpiricDist(uint32_t n, MixtureDist& dist, uint32_t k = 0);
-  /**
-   * Конструктор с параметром эмпирического распределения
-   * @param n Размер выборки, которая будет сгенерирована из основного
-   * распределения.
-   * @param dist Эмпирическое распределение, из которого генерируется выборка.
-   * @param k Количество интервалов. По умолчанию рассчитывается по формуле
-   * Стёрджеса.
-   */
-  explicit EmpiricDist(uint32_t n, EmpiricDist& dist, uint32_t k = 0);
-  /**
-   * Конструктор чтения из файла
-   * @param file_name Имя файла, из которого читается распределение.
-   */
-  explicit EmpiricDist(std::string file_name);
-  /**
-   * Сохранение распределения в файл
-   * @param file_name Имя файла, в который сохраняется распределение.
-   */
-  void save(const std::string& file_name) const;
+  explicit EmpiricDist(uint32_t n, IDist& dist, uint32_t k = 0);
+
+  // Персистентность
+
+  void save(const std::string& file_name) const override;
+  void save(std::ofstream& file) const noexcept override;
+  void load(std::ifstream& file) override;
+  void load(const std::string& file_name) override;
+
   // Конструктор копирования
   EmpiricDist(const EmpiricDist& other);
   // Оператор присваивания копированием
@@ -96,48 +75,12 @@ class EmpiricDist {
 
   // Функции интерфейса
 
-  /**
-   * Вычисление плотности вероятности в точке x
-   * @param x Точка, в которой вычисляется плотность вероятности
-   * @return Значение плотности вероятности в точке x
-   */
-  ld density(ld x) const noexcept;
-  /**
-   * Вычисление плотности вероятности в каждой точке векторa x
-   * @param x Вектор точек, в которых вычисляется плотность вероятности
-   * @return Вектор значений плотности вероятности в каждой точке из вектора x
-   */
-  nstu::vector density(const nstu::vector& x) const;
-  /**
-   * Вычисление математического ожидания эмпирического распределения
-   * @return Значение математического ожидания эмпирического распределения
-   */
-  ld M() const noexcept;
-  /**
-   * Вычисление дисперсии эмпирического распределения
-   * @return Значение дисперсии эмпирического распределения
-   */
-  ld D() const noexcept;
-  /**
-   * Вычисление коэффициента асимметрии эмпирического распределения
-   * @return Значение коэффициента асимметрии эмпирического распределения
-   */
-  ld G1() const noexcept;
-  /**
-   * Вычисление коэффициента эксцесса эмпирического распределения
-   * @return Значение коэффициента эксцесса эмпирического распределения
-   */
-  ld G2() const noexcept;
-  /**
-   * Моделирование случайной величины по эмпирическому распределению
-   * @return Случайная величина, смодулированная по эмпирическому распределению
-   */
-  ld Xi() const noexcept;
-  /**
-   * Моделирование выборки случайных величин по эмпирическому распределению
-   * @param size Размер выборки случайных величин
-   * @return Выборка случайных величин, смоделированных по эмпирическому
-   * распределению
-   */
-  nstu::vector Xi(uint32_t size) const;
+  ld density(ld x) const noexcept override;
+  nstu::vector density(const nstu::vector& x) const override;
+  ld M() const noexcept override;
+  ld D() const noexcept override;
+  ld G1() const noexcept override;
+  ld G2() const noexcept override;
+  ld Xi() const noexcept override;
+  nstu::vector Xi(uint32_t size) const override;
 };
