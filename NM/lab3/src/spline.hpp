@@ -33,6 +33,7 @@ class SmoothingSpline {
       alpha[i] = (1 - p) * initSample[i];
     }
     alpha[n - 1] = (1 - p) * initSample[n - 1];
+    // Метод Томсона (u_diag = d_diag = -p, diag = 1+p)
     vector<ld> P(n), Q(n);
     P[0] = p / (1 + p);
     Q[0] = alpha[0] / (1 + p);
@@ -42,6 +43,7 @@ class SmoothingSpline {
     }
     f[n - 1] = Q[n - 1];
     for (int i = n - 2; i >= 0; --i) f[i] = P[i] * f[i + 1] + Q[i];
+    // сплайны 1 порядка по точкам f
     for (int i = 0; i < n - 1; ++i) {
       ld x_k = i + 1;
       Polynom xi({-x_k, 1});
