@@ -19,10 +19,10 @@ class SmoothingSpline {
    * считая что x - индекс, f(x) - init[x]
    * сохраняем сплайны в splines
    */
-  SmoothingSpline(ld p, const vector<ld>& init)
+  SmoothingSpline(ld p, const vector<ld>& init, const vector<ld>& weights)
       : p(p), initSample(init), splines(initSample.size() - 1), f(init) {
     auto n = initSample.size();
-    vector<ld> d_diag(n, 0), m_diag(n, 0), u_diag(n, 0);
+    vector<ld> m_diag(n, 0);
     vector<ld> alpha(n, 0);
     vector<Polynom> phi_1(n - 1), phi_2(n - 1);
     for (int i = 0; i < n - 1; ++i) {
@@ -30,19 +30,21 @@ class SmoothingSpline {
       Polynom xi({-x_k, 1});
       xi = xi * 2 - 1;  // h_k = 1 всегда
       phi_1[i] = (1 - xi) / 2, phi_2[i] = (1 + xi) / 2;
-      alpha[i] = (1 - p) * initSample[i];
+      alpha[i] = (1 - p) * initSample[i] * weights[i];
+      m_diag[i] = (1 - p) * weights[i] + 2 * p;
     }
-    alpha[n - 1] = (1 - p) * initSample[n - 1];
-    // Метод Томсона (u_diag = d_diag = -p, diag = 1+p)
-    vector<ld> P(n), Q(n);
-    P[0] = p / (1 + p);
-    Q[0] = alpha[0] / (1 + p);
+    m_diag[0] -= p;
+    m_diag[n - 1] = (1 - p) * weights[n - 1] + p;
+    alpha[n - 1] = (1 - p) * initSample[n - 1] * weights[n - 1];
+    // Метод прогонки (u_diag = d_diag = -p)
     for (int i = 1; i < n; ++i) {
-      P[i] = p / (1 + p * (P[i - 1] + 1));
-      Q[i] = (alpha[i] + p * Q[i - 1]) / (1 + p * (P[i - 1] + 1));
+      ld m = -p / m_diag[i - 1];
+      m_diag[i] -= p * p / m_diag[i - 1];
+      alpha[i] += p * alpha[i - 1] / m_diag[i - 1];
     }
-    f[n - 1] = Q[n - 1];
-    for (int i = n - 2; i >= 0; --i) f[i] = P[i] * f[i + 1] + Q[i];
+    f[n - 1] = alpha[n - 1] / m_diag[n - 1];
+    for (int i = n - 2; i >= 0; --i)
+      f[i] = (alpha[i] + p * f[i + 1]) / m_diag[i];
     // сплайны 1 порядка по точкам f
     for (int i = 0; i < n - 1; ++i) {
       ld x_k = i + 1;
