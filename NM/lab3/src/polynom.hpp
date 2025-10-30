@@ -61,19 +61,21 @@ class Polynom {
 
   Polynom operator/(ld num) const { return Polynom(*this) /= num; }
 
-  Polynom operator+=(const Polynom& other) {
-    if (other.degree() > degree()) coeffs.resize(other.degree());
-    for (int i = 0; i < other.degree(); ++i) coeffs[i] += other[i];
+  Polynom& operator+=(const Polynom& other) {
+    if (other.degree() > degree()) coeffs.resize(other.degree(), 0.0);
+    for (int i = 0; i < other.degree(); ++i) {
+      coeffs[i] += other[i];
+    }
     return *this;
   }
 
-  Polynom operator-=(const Polynom& other) {
+  Polynom& operator-=(const Polynom& other) {
     if (other.degree() > degree()) coeffs.resize(other.degree());
     for (int i = 0; i < other.degree(); ++i) coeffs[i] -= other[i];
     return *this;
   }
 
-  Polynom operator*=(ld num) noexcept {
+  Polynom& operator*=(ld num) noexcept {
     for (ld& x : coeffs) x *= num;
     return *this;
   }
@@ -86,17 +88,11 @@ class Polynom {
 
   /**
    * @brief Вывод многочлена
-   * @param left - левая граница вывода
-   * @param right - правая граница вывода
-   * При отсутствии аргументов выводит многочлен полностью
    */
-  void print(int left = -1, int right = -1) const {
-    if (left > right) throw invalid_argument("invalid range");
-    if (left == -1 || right == -1) {
-      right = coeffs.size() - 1;
-      left = 0;
-    }
-    if (coeffs[right] < 0) cout << '-';
+  void print() const {
+    ld right = degree() - 1;
+    ld left = 0;
+    if (right > 0 && coeffs[right] < 0) cout << '-';
     for (; right > left + 1; --right) {
       if (coeffs[right] != 0) {
         if (coeffs[right] != 1) cout << abs(coeffs[right]);
@@ -104,16 +100,29 @@ class Polynom {
         cout << ((coeffs[right - 1] >= 0) ? " + " : " - ");
       }
     }
-    if (right == 1 && coeffs[right] != 0) {
-      if (coeffs[right] != 1) cout << abs(coeffs[right]);
-      cout << "x";
-      cout << ((coeffs[right - 1] >= 0) ? " + " : " - ");
+    if (right == 1) {
+      if (coeffs[right] != 0) {
+        if (coeffs[right] != 1) cout << abs(coeffs[right]);
+        cout << "x";
+        cout << ((coeffs[right - 1] >= 0) ? " + " : " - ");
+      }
       --right;
     }
-    if (right == 0) cout << abs(coeffs[0]) << endl;
+    if (right == 0) cout << abs(coeffs[0]);
+    cout << endl;
   }
 
+  // степень полинома (длина вектора)
   int degree() const noexcept { return coeffs.size(); }
+
+  Polynom der() const noexcept {
+    if (degree() > 1) {
+      Polynom result(degree() - 1);
+      for (int i = 1; i < degree(); ++i) result[i - 1] = coeffs[i] * i;
+      return result;
+    } else
+      return Polynom(0);
+  }
 };
 
 Polynom operator+(ld num, const Polynom& other) { return other + num; }
