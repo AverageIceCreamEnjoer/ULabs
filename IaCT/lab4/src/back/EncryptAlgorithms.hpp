@@ -19,12 +19,18 @@ class EncryptAlgorithms : public QObject {
    * @brief Конструктор класса EncryptionAlgorithms.
    * @param parent Родительский  Qt объект.
    */
-  explicit EncryptAlgorithms(QObject* parent = nullptr);
+  explicit EncryptAlgorithms(QObject* parent = nullptr) noexcept;
+
+  Q_INVOKABLE QString readFileContent(const QString& filePath) const noexcept;
+  Q_INVOKABLE bool saveContent(const QString& filePath,
+                               const QString& text) const noexcept;
 
   Q_INVOKABLE QString encryptPlayfair(const QString& keyPath,
-                                      const QString& input);
+                                      const QString& input) noexcept;
   Q_INVOKABLE QString decryptPlayfair(const QString& keyPath,
-                                      const QString& input);
+                                      const QString& input) noexcept {
+    return "";
+  }
 
  private:
   /**
@@ -32,8 +38,10 @@ class EncryptAlgorithms : public QObject {
    */
   class Playfair {
    private:
-    QChar filled_char_;     // символ-заполнитель
-    Matrix<QChar> matrix_;  // матрица алфавита
+    QString key_;        // ключ-слово
+    QChar filled_char_;  // символ-заполнитель
+    QString matrix_;     // матрица алфавита
+    int dimension_;      // размерность матрицы
 
     /**
      * @brief Подготовить текст к зашифровке - заменить пробелы и повторы.
