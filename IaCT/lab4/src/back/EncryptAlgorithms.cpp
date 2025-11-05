@@ -48,14 +48,14 @@ QString EncryptAlgorithms::readFileContent(
 bool EncryptAlgorithms::saveContent(const QString& filePath,
                                     const QString& text) const noexcept {
   try {
-    return saveFile(filePath, text);
+    return (filePath.isEmpty()) ? false : saveFile(filePath, text);
   } catch (...) {
     return false;
   }
 }
 
 EncryptAlgorithms::EncryptAlgorithms(QObject* parent) noexcept
-    : QObject(parent), playfair_() {}
+    : QObject(parent), playfair_(nullptr) {}
 
 QString EncryptAlgorithms::encryptPlayfair(const QString& keyPath,
                                            const QString& input) noexcept {
@@ -63,8 +63,8 @@ QString EncryptAlgorithms::encryptPlayfair(const QString& keyPath,
     QString key;
     if (openFile(keyPath, key)) {
       if (playfair_.get() == nullptr || playfair_->getKey() != key)
-        playfair_ = std::make_unique<Playfair>(
-            keyPath, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", '_');
+        playfair_ =
+            std::make_unique<Playfair>(key, "ABCDEFGHIJKLMNOPQRSTUVWXYZ_", '*');
       return playfair_->encrypt(input);
     } else if (playfair_.get() != nullptr) {
       qInfo() << "Используется сохранённый ключ";
@@ -73,7 +73,8 @@ QString EncryptAlgorithms::encryptPlayfair(const QString& keyPath,
       qWarning() << "Ошибка: невозможно открыть файл с ключом";
       return "Ошибка при открытии файла ключа";
     }
-  } catch (...) {
+  } catch (std::exception& e) {
+    qWarning() << e.what();
     return "Ошибка при шифровании";
   }
 }
@@ -84,7 +85,10 @@ EncryptAlgorithms::Playfair::Playfair(const QString& key,
     : key_(key), filled_char_(filled_char) {
   if (key.isEmpty()) throw std::invalid_argument("Пустой ключ");
   if (alphabet.isEmpty()) throw std::invalid_argument("Пустой алфавит");
+  QString key_prepared = "";
   for (QChar i : key)
+    if (!key_prepared.contains(i)) key_prepared.append(i);
+  for (QChar i : key_prepared)
     if (!alphabet.contains(i))
       throw std::invalid_argument("Ключ содержит символ не входящий в алфавит");
   if (alphabet.contains(filled_char_))
@@ -93,25 +97,31 @@ EncryptAlgorithms::Playfair::Playfair(const QString& key,
   dimension_ = static_cast<int>(std::ceil(std::sqrt(alphabet.size())));
   matrix_ = "";
   std::vector<bool> used(alphabet.size(), false);
-  for (auto i : key) {
+  for (auto i : key_prepared) {
     matrix_.append(i);
     used[alphabet.indexOf(i)] = true;
   }
   for (int i = 0; i < alphabet.size(); i++)
     if (!used[i]) matrix_.append(alphabet[i]);
-  while (matrix_.size() != dimension_ * dimension_)
-    matrix_.append(filled_char_);
-  QString msg = "Матрица Плейфера успешно создана:\n";
-  for (int i = 0; i < dimension_; ++i) {
-    for (int j = 0; j < dimension_; ++j)
+  matrix_.append(filled_char_);
+  qInfo() << "Матрица Плейфера успешно создана:";
+  for (int i = 0; i < matrix_.size() / dimension_ + 1; ++i) {
+    QString msg = "";
+    for (int j = 0;
+         j < ((i != matrix_.size() / dimension_) ? dimension_
+                                                 : matrix_.size() % dimension_);
+         ++j) {
       msg += (QString(matrix_[i * dimension_ + j]) + " ");
-    msg.append("\n");
+    }
+    qInfo() << msg;
   }
-  qInfo() << msg;
 }
 
 QString EncryptAlgorithms::Playfair::encrypt(const QString& text) const {
-  for (QChar i : text) {
+  QString result(text);
+  prepareText(result, true);
+  qInfo() << result;
+  for (QChar i : result) {
     bool in = false;
     auto m_it = matrix_.begin();
     while (!in && m_it != matrix_.end())
@@ -121,8 +131,6 @@ QString EncryptAlgorithms::Playfair::encrypt(const QString& text) const {
           "Текст содержит символ не входящий в "
           "алфавит");
   }
-  QString result(text);
-  prepareText(result, true);
   applyRules(result);
   return result;
 }
@@ -150,6 +158,7 @@ void EncryptAlgorithms::Playfair::prepareText(QString& text, bool mode) const {
       if (text[i] == ' ') text[i] = '_';
       if (text[i] == text[i + 1]) text.insert((i++) + 1, filled_char_);
     }
+    if (text[text.size() - 1] == ' ') text[text.size() - 1] = '_';
     if (text.size() % 2 != 0) text.append(filled_char_);
   }
 }
@@ -157,8 +166,11 @@ void EncryptAlgorithms::Playfair::prepareText(QString& text, bool mode) const {
 void EncryptAlgorithms::Playfair::applyRules(QString& text) const noexcept {
   for (int i = 0; i < text.size() - 1; i += 2) {
     std::pair<int, int> idx1{0, 0}, idx2{0, 0};
-    for (int mi = 0; mi < dimension_; ++mi) {
-      for (int mj = 0; mj < dimension_; ++mj) {
+    for (int mi = 0; mi < matrix_.size() / dimension_ + 1; ++mi) {
+      for (int mj = 0; mj < ((mi != matrix_.size() / dimension_)
+                                 ? dimension_
+                                 : matrix_.size() % dimension_);
+           ++mj) {
         if (matrix_[mi * dimension_ + mj] == text[i]) idx1 = {mi, mj};
         if (matrix_[mi * dimension_ + mj] == text[i + 1]) idx2 = {mi, mj};
       }
@@ -173,6 +185,12 @@ void EncryptAlgorithms::Playfair::applyRules(QString& text) const noexcept {
           matrix_[((idx1.first + 1) % dimension_) * dimension_ + idx1.second];
       text[i + 1] =
           matrix_[((idx2.first + 1) % dimension_) * dimension_ + idx2.second];
+    } else if (idx1.first * dimension_ + idx2.second >= matrix_.size() ||
+               idx2.first * dimension_ + idx1.second >= matrix_.size()) {
+      int tmp = ((idx1.first + 1) % dimension_) * dimension_ + idx1.second;
+      text[i] = matrix_[(tmp >= matrix_.size() ? idx1.second : tmp)];
+      tmp = ((idx2.first + 1) % dimension_) * dimension_ + idx2.second;
+      text[i + 1] = matrix_[(tmp >= matrix_.size()) ? idx2.second : tmp];
     } else {
       text[i] = matrix_[idx1.first * dimension_ + idx2.second];
       text[i + 1] = matrix_[idx2.first * dimension_ + idx1.second];

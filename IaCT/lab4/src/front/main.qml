@@ -30,7 +30,7 @@ ApplicationWindow {
     FileDialog {
         id: openDialog
         title: "Выберите файл для шифрования"
-        /*onAccepted: {
+        onAccepted: {
             if (selectedFile) {
                 // Преобразуем строку URL в локальный путь
                 var pathString = selectedFile.toString();
@@ -38,17 +38,22 @@ ApplicationWindow {
                     pathString = pathString.substring(7); // Удаляем "file://"
                 }
                 openDialog.sourceFileInput.filePath = pathString;
+                if (fileContentTA) {
+                    fileContentTA.text = coder.readFileContent(pathString);
+                    fileContentTA = null;
+                }
             }
         }
         // Пользовательское свойство, чтобы диалог "знал", какое поле обновлять
-        property FileInput sourceFileInput*/
+        property FileInput sourceFileInput
+        property StyledTextArea fileContentTA: null
     }
 
     FileDialog {
         id: saveDialog
         title: "Выберите файл для сохранения"
         fileMode: FileDialog.SaveFile // Позволяет вводить новое имя файла
-        /*onAccepted: {
+        onAccepted: {
             if (selectedFile) {
                 // Преобразуем строку URL в локальный путь
                 var pathString = selectedFile.toString();
@@ -58,8 +63,9 @@ ApplicationWindow {
                 saveDialog.sourceFileInput.filePath = pathString;
             }
         }
-        property FileInput sourceFileInput*/
+        property FileInput sourceFileInput
     }
+
     Item {
         id: contentContainer
         width: parent.width
@@ -91,12 +97,7 @@ ApplicationWindow {
                     labelText: "Ключ:"
                     placeholderText: "Выберите файл с ключом шифра..."
                     onButtonClicked: {
-                        openDialog.onAccepted = function () {
-                            // Получаем путь к файлу (убираем "file://")
-                            var pathString = openDialog.selectedFile.toString().substring(7);
-                            encryptKey.filePath = pathString;
-                        };
-                        //openDialog.sourceFileInput = encodeKey;
+                        openDialog.sourceFileInput = encryptKey;
                         openDialog.open();
                     }
                 }
@@ -115,14 +116,8 @@ ApplicationWindow {
                     labelText: "Входной файл:"
                     placeholderText: "Выберите файл для шифрования..."
                     onButtonClicked: {
-                        openDialog.onAccepted = function () {
-                            // Получаем путь к файлу (убираем "file://")
-                            var pathString = openDialog.selectedFile.toString().substring(7);
-                            encryptInputPath.filePath = pathString;
-                            var content = coder.readFileContent(pathString);
-                            encryptInputText.text = content;
-                        };
-                        //openDialog.sourceFileInput = encryptInputPath;
+                        openDialog.sourceFileInput = encryptInputPath;
+                        openDialog.fileContentTA = encryptInputText;
                         openDialog.open();
                     }
                 }
@@ -132,12 +127,7 @@ ApplicationWindow {
                     labelText: "Выходной файл:"
                     placeholderText: "Выбрать, куда сохранить выходной файл..."
                     onButtonClicked: {
-                        saveDialog.onAccepted = function () {
-                            // Получаем путь к файлу (убираем "file://")
-                            var pathString = saveDialog.selectedFile.toString().substring(7);
-                            encryptOutputPath.filePath = pathString;
-                        };
-                        //saveDialog.sourceFileInput = encryptOutputPath;
+                        saveDialog.sourceFileInput = encryptOutputPath;
                         saveDialog.open();
                     }
                 }
