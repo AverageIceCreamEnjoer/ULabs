@@ -157,7 +157,7 @@ ApplicationWindow {
                 placeholderText: "Результат шифрования..."
             }
             Label {
-                id: statusLabel
+                id: encryptStatusLabel
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: encryptOutputText.bottom
                 anchors.margins: 15
@@ -166,9 +166,83 @@ ApplicationWindow {
             }
         }
         Item {
-            Rectangle {
-                anchors.fill: parent
-                color: "red"
+            FileInput {
+                id: decryptKey
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.horizontalCenter
+                anchors.margins: 15
+                labelText: "Ключ:"
+                placeholderText: "Выберите файл с ключом шифра..."
+                onButtonClicked: {
+                    openDialog.sourceFileInput = decryptKey;
+                    openDialog.open();
+                }
+            }
+            Button {
+                id: decryptButton
+                anchors.top: parent.top
+                anchors.left: parent.horizontalCenter
+                anchors.right: parent.right
+                anchors.margins: 15
+                text: "Расшифровать собщение"
+                onClicked: {
+                    decryptOutputText.text = coder.decryptPlayfair(decryptKey.filePath, decryptInputText.text);
+                    coder.saveContent(decryptOutputPath.filePath, decryptOutputText.text);
+                }
+            }
+            FileInput {
+                id: decryptInputPath
+                anchors.top: decryptKey.bottom
+                anchors.left: parent.left
+                anchors.right: parent.horizontalCenter
+                anchors.margins: 15
+                labelText: "Входной файл:"
+                placeholderText: "Выберите файл для расшифровки..."
+                onButtonClicked: {
+                    openDialog.sourceFileInput = decryptInputPath;
+                    openDialog.fileContentTA = decryptInputText;
+                    openDialog.open();
+                }
+            }
+            FileInput {
+                id: decryptOutputPath
+                anchors.top: decryptKey.bottom
+                anchors.left: parent.horizontalCenter
+                anchors.right: parent.right
+                anchors.margins: 15
+                labelText: "Выходной файл:"
+                placeholderText: "Выбрать, куда сохранить выходной файл..."
+                onButtonClicked: {
+                    saveDialog.sourceFileInput = decryptOutputPath;
+                    saveDialog.open();
+                }
+            }
+            StyledTextArea {
+                id: decryptInputText
+                anchors.top: decryptInputPath.bottom
+                anchors.left: parent.left
+                anchors.right: parent.horizontalCenter
+                anchors.margins: 15
+                readOnly: false
+                placeholderText: "Сообщение для расшифровки..."
+            }
+            StyledTextArea {
+                id: decryptOutputText
+                anchors.top: decryptInputPath.bottom
+                anchors.left: parent.horizontalCenter
+                anchors.right: parent.right
+                anchors.margins: 15
+                readOnly: true
+                placeholderText: "Результат расшифровки..."
+            }
+            Label {
+                id: decryptStatusLabel
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: decryptOutputText.bottom
+                anchors.margins: 15
+                horizontalAlignment: Text.AlignHCenter
+                font.bold: true
             }
         }
     }

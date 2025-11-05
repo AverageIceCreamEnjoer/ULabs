@@ -28,9 +28,7 @@ class EncryptAlgorithms : public QObject {
   Q_INVOKABLE QString encryptPlayfair(const QString& keyPath,
                                       const QString& input) noexcept;
   Q_INVOKABLE QString decryptPlayfair(const QString& keyPath,
-                                      const QString& input) noexcept {
-    return "";
-  }
+                                      const QString& input) noexcept;
 
  private:
   /**
@@ -54,7 +52,7 @@ class EncryptAlgorithms : public QObject {
      * @brief Применить правила Плейфера для шифрования.
      * @param text Текст для зашифровки (изменяется).
      */
-    void applyRules(QString& text) const noexcept;
+    void applyRules(QString& text, bool mode) const noexcept;
 
    public:
     /**
