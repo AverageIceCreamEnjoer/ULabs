@@ -15,7 +15,7 @@ ApplicationWindow {
     id: root
     width: 800
     height: 300
-    minimumWidth: rootLayout.implicitWidth// + 30
+    //minimumWidth: rootLayout.implicitWidth// + 30
     //minimumHeight: rootLayout.implicitHeight
     visible: true
     //Material.theme: Material.Light
@@ -65,93 +65,120 @@ ApplicationWindow {
         }
         property FileInput sourceFileInput
     }
-
-    Item {
-        id: contentContainer
-        width: parent.width
-        //height: rootLayout.implicitHeight
-        anchors.fill: parent
-        //Layout.fillHeight: true
-        //Layout.fillWidth: true
-        ScrollView {
-            anchors.fill: parent
-            height: parent.height
-            ScrollBar.vertical.interactive: true
-            //Layout.fillHeight: true
-            width: parent.width
-            clip: true
-            //Layout.fillWidth: true
-            GridLayout {
-                id: rootLayout
-                //Layout.fillWidth: true
-                columns: 6
-                anchors.fill: parent
-                anchors.margins: 10
-                anchors.centerIn: parent
-                //Layout.leftMargin: 10
-                //Layout.alignment: Qt.AlignHCenter
-                width: parent.parent.width - 20
-                FileInput {
-                    id: encryptKey
-                    Layout.columnSpan: 3
-                    labelText: "Ключ:"
-                    placeholderText: "Выберите файл с ключом шифра..."
-                    onButtonClicked: {
-                        openDialog.sourceFileInput = encryptKey;
-                        openDialog.open();
-                    }
-                }
-                Button {
-                    id: encryptButton
-                    Layout.columnSpan: 3
-                    text: "Зашифровать собщение"
-                    onClicked: {
-                        encryptOutputText.text = coder.encryptPlayfair(encryptKey.filePath, encryptInputText.text);
-                        coder.saveContent(encryptOutputPath.filePath, encryptOutputText.text);
-                    }
-                }
-                FileInput {
-                    id: encryptInputPath
-                    Layout.columnSpan: 3
-                    labelText: "Входной файл:"
-                    placeholderText: "Выберите файл для шифрования..."
-                    onButtonClicked: {
-                        openDialog.sourceFileInput = encryptInputPath;
-                        openDialog.fileContentTA = encryptInputText;
-                        openDialog.open();
-                    }
-                }
-                FileInput {
-                    id: encryptOutputPath
-                    Layout.columnSpan: 3
-                    labelText: "Выходной файл:"
-                    placeholderText: "Выбрать, куда сохранить выходной файл..."
-                    onButtonClicked: {
-                        saveDialog.sourceFileInput = encryptOutputPath;
-                        saveDialog.open();
-                    }
-                }
-                StyledTextArea {
-                    id: encryptInputText
-                    Layout.columnSpan: 3
-                    readOnly: false
-                    placeholderText: "Сообщение для шифрования..."
-                }
-                StyledTextArea {
-                    id: encryptOutputText
-                    Layout.columnSpan: 3
-                    readOnly: true
-                    placeholderText: "Результат шифрования..."
-                }
-                Label {
-                    id: statusLabel
-                    Layout.fillWidth: true
-                    Layout.topMargin: 15
-                    Layout.bottomMargin: 15
-                    horizontalAlignment: Text.AlignHCenter
-                    font.bold: true
+    TabBar {
+        id: bar
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        TabButton {
+            text: "Шифрование"
+        }
+        TabButton {
+            text: "Дешифрование"
+        }
+    }
+    SwipeView {
+        id: swipe
+        //anchors.fill: parent
+        anchors.top: bar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        currentIndex: bar.currentIndex
+        Item {
+            FileInput {
+                id: encryptKey
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.horizontalCenter
+                anchors.margins: 15
+                labelText: "Ключ:"
+                placeholderText: "Выберите файл с ключом шифра..."
+                onButtonClicked: {
+                    openDialog.sourceFileInput = encryptKey;
+                    openDialog.open();
                 }
             }
+            Button {
+                id: encryptButton
+                anchors.top: parent.top
+                anchors.left: parent.horizontalCenter
+                anchors.right: parent.right
+                anchors.margins: 15
+                text: "Зашифровать собщение"
+                onClicked: {
+                    encryptOutputText.text = coder.encryptPlayfair(encryptKey.filePath, encryptInputText.text);
+                    coder.saveContent(encryptOutputPath.filePath, encryptOutputText.text);
+                }
+            }
+            FileInput {
+                id: encryptInputPath
+                anchors.top: encryptKey.bottom
+                anchors.left: parent.left
+                anchors.right: parent.horizontalCenter
+                anchors.margins: 15
+                labelText: "Входной файл:"
+                placeholderText: "Выберите файл для шифрования..."
+                onButtonClicked: {
+                    openDialog.sourceFileInput = encryptInputPath;
+                    openDialog.fileContentTA = encryptInputText;
+                    openDialog.open();
+                }
+            }
+            FileInput {
+                id: encryptOutputPath
+                anchors.top: encryptKey.bottom
+                anchors.left: parent.horizontalCenter
+                anchors.right: parent.right
+                anchors.margins: 15
+                labelText: "Выходной файл:"
+                placeholderText: "Выбрать, куда сохранить выходной файл..."
+                onButtonClicked: {
+                    saveDialog.sourceFileInput = encryptOutputPath;
+                    saveDialog.open();
+                }
+            }
+            StyledTextArea {
+                id: encryptInputText
+                anchors.top: encryptInputPath.bottom
+                anchors.left: parent.left
+                anchors.right: parent.horizontalCenter
+                anchors.margins: 15
+                readOnly: false
+                placeholderText: "Сообщение для шифрования..."
+            }
+            StyledTextArea {
+                id: encryptOutputText
+                anchors.top: encryptInputPath.bottom
+                anchors.left: parent.horizontalCenter
+                anchors.right: parent.right
+                anchors.margins: 15
+                readOnly: true
+                placeholderText: "Результат шифрования..."
+            }
+            Label {
+                id: statusLabel
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: encryptOutputText.bottom
+                anchors.margins: 15
+                horizontalAlignment: Text.AlignHCenter
+                font.bold: true
+            }
         }
+        Item {
+            Rectangle {
+                anchors.fill: parent
+                color: "red"
+            }
+        }
+    }
+    PageIndicator {
+        id: indicator
+
+        count: swipe.count
+        currentIndex: swipe.currentIndex
+
+        anchors.bottom: swipe.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
     }
 }
