@@ -24,8 +24,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Мы будем использовать модули Core (основа), Gui (для окна) и Quick (для QML)
 find_package(Qt6 COMPONENTS Core Gui Quick QuickControls2 QuickDialogs2 REQUIRED)
 
-include_directories("/home/thundergod/cpp_matrix/src/")
-
 # Создаем исполняемый файл (наше приложение)
 qt_add_executable(iact4
     main.cpp
