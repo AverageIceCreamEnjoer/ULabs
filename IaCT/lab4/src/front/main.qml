@@ -236,14 +236,6 @@ ApplicationWindow {
                 readOnly: true
                 placeholderText: "Результат расшифровки..."
             }
-            Label {
-                id: decryptStatusLabel
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: decryptOutputText.bottom
-                anchors.margins: 15
-                horizontalAlignment: Text.AlignHCenter
-                font.bold: true
-            }
         }
     }
     PageIndicator {

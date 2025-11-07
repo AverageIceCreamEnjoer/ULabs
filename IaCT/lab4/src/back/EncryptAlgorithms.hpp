@@ -1,12 +1,7 @@
 #pragma once
 
-#include <QMap>
 #include <QObject>
 #include <QString>
-#include <QVariant>
-#include <QVector>
-
-#include "matrix.h"
 
 /**
  * @class EncryptAlgorithms
@@ -21,12 +16,35 @@ class EncryptAlgorithms : public QObject {
    */
   explicit EncryptAlgorithms(QObject* parent = nullptr) noexcept;
 
+  /**
+   * @brief Чтение содержимого файла.
+   * @param filePath Путь к файлу.
+   * @return Содержимое файла.
+   */
   Q_INVOKABLE QString readFileContent(const QString& filePath) const noexcept;
+  /**
+   * @brief Запись содержимого файла.
+   * @param filePath Путь к файлу.
+   * @param text Содержимое файла.
+   * @return Удалось ли записать содержимое файла.
+   */
   Q_INVOKABLE bool saveContent(const QString& filePath,
                                const QString& text) const noexcept;
 
+  /**
+   * @brief Зашифровать текст с помощью алгоритма Плейфера.
+   * @param keyPath Путь к файлу с ключом.
+   * @param input Текст для зашифровки.
+   * @return Зашифрованный текст.
+   */
   Q_INVOKABLE QString encryptPlayfair(const QString& keyPath,
                                       const QString& input) noexcept;
+  /**
+   * @brief Расшифровать текст с помощью алгоритма Плейфера.
+   * @param keyPath Путь к файлу с ключом.
+   * @param input Текст для расшифровки.
+   * @return Расшифрованный текст.
+   */
   Q_INVOKABLE QString decryptPlayfair(const QString& keyPath,
                                       const QString& input) noexcept;
 
