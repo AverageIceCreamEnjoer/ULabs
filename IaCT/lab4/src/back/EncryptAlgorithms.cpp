@@ -137,7 +137,7 @@ EncryptAlgorithms::Playfair::Playfair(const QString& key,
         idx = 0;
       }
     else if (!used[idx++])
-      matrix_.append(alphabet[idx].toLower());
+      matrix_.append(alphabet[idx - 1].toLower());
   }
   qInfo() << "Матрица Плейфера успешно создана:";
   for (int i = 0; i < dimension_; ++i) {
