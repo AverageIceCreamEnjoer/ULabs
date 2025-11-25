@@ -121,7 +121,7 @@ QString Generator::generatePrime(const QString& init_params) noexcept {
     qInfo() << "Количество итераций теста Леманна:" << k;
     long i = 0;
     while (!primeFound) {
-      int candidate = randomInRange(data.begin, data.end + 1);
+      int candidate = randomInRange(data.begin, data.end);
       if (candidate < 4) {
         prime = candidate;
         primeFound = true;
