@@ -165,11 +165,11 @@ void SaveSignal(const vec& signal, const string& filename, int type = -1) {
   ofstream out(filename);
   if (type == -1) {
     out << "z" << endl;
-    for (cd x : signal) out << amplitude(x) << endl;
+    for (cd x : signal) out << x.real() << endl;
   } else {
     out << "x,z" << endl;
     for (int i = 0; i < signal.size(); ++i) {
-      out << (1 << type) * i << "," << amplitude(signal[i]) << endl;
+      out << (1 << type) * i << "," << signal[i].real() << endl;
     }
   }
 }
